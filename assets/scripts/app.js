@@ -1,11 +1,11 @@
 ((LT) => {
 	const STRING_KEY = 'lineartextur.app.data.string';
 	const FONTS_KEY = 'lineartextur.app.data.fonts';
-	const FONT_SIZE_KEY = 'lineartextur.app.data.font-size';
-	const COLUMN_SPACING_KEY = 'lineartextur.app.data.column-spacing';
-	const ROW_SPACING_KEY = 'lineartextur.app.data.row-spacing';
-	const MATCH_X_HEIGHT_KEY = 'lineartextur.app.data.match-x-height';
-	const AUTOSIZE_FONT_SETTINGS_KEY = 'lineartextur.app.data.autosize-font-settings';
+	const FONT_SIZE_KEY = 'lineartextur.app.preferences.font-size';
+	const COLUMN_SPACING_KEY = 'lineartextur.app.preferences.column-spacing';
+	const ROW_SPACING_KEY = 'lineartextur.app.preferences.row-spacing';
+	const MATCH_X_HEIGHT_KEY = 'lineartextur.app.preferences.match-x-height';
+	const AUTOSIZE_FONT_SETTINGS_KEY = 'lineartextur.app.preferences.autosize-font-settings';
 	
 	// Utilitys
 	
