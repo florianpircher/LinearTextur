@@ -118,10 +118,7 @@
 		});
 	
 	const parseFontConfiguration = (string, defaultConfig) => {
-		const parts = string
-			.replace(/(\d)([^\d\s])/g, '$1|$2')
-			.replace(/([^\d\s])(\d)/g, '$1|$2')
-			.split(/[\s,]*\|[\s,]*|[\s,]+/);
+		const parts = string.split(/[\s,]+/);
 		let weight = defaultConfig.weight;
 		let style = defaultConfig.style;
 		const features = [...defaultConfig.features];
@@ -133,7 +130,7 @@
 			if ((completeWeight = complete(part, ['bold'])) !== null) {
 				weight = completeWeight;
 			}
-			if (/^\d+$/.test(part)) {
+			if (/^\d{3}$/.test(part)) {
 				weight = part;
 			}
 			else if ((completeStyle = complete(part, ['italic', 'oblique'])) !== null) {
