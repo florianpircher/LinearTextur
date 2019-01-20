@@ -170,7 +170,7 @@
 	// Drawing
 	
 	const render = (cells, font) => cells.map((cell) => {
-		const cellNode = document.createElement('div');
+		const cellNode = document.createElement('td');
 		cellNode.classList.add('cell-view');
 		
 		const cellTextNode = document.createElement('div');
@@ -200,7 +200,7 @@
 	});
 	
 	const drawRow = (renderings) => new Promise((resolve) => {
-		const rowNode = document.createElement('div');
+		const rowNode = document.createElement('tr');
 		rowNode.classList.add('row-view');
 		
 		for (const rendering of renderings) {

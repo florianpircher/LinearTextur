@@ -271,7 +271,6 @@
 	--setting-font-size: 2rem;
 	--setting-column-spacing: 1.5em;
 	--setting-row-spacing: 0.5em;
-	display: table;
 	font-size: var(--setting-font-size);
 	line-height: 1;
 	margin-right: auto;
@@ -279,12 +278,7 @@
 	padding: 0.25em 0.5em;
 }
 
-.row-view {
-	display: table-row;
-}
-
 .cell-view {
-	display: table-cell;
 	white-space: pre;
 }
 .cell-view + .cell-view {
