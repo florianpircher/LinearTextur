@@ -148,6 +148,7 @@
 	
 	const parseFontsString = (string) => {
 		const matches = string.split(/[\n;]/)
+			.filter(x => !/^\s*(?:#|\/\/)/.test(x))
 			.map(x => x.match(/^([^:(]*)(?:\(([^):]*)\)\s*)?(?:(?:\(.*)?:(.*))?/))
 			.filter(x => x !== null);
 		let defaultConfig = LT.FontConfiguration.none;
