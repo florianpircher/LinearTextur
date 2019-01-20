@@ -518,4 +518,10 @@
 		field.addEventListener('change', update);
 		initField(SHOW_FONT_LABELS_KEY, x => field.checked = x, update);
 	});
+	
+	// Init
+	
+	window.addEventListener('load', () => {
+		document.documentElement.classList.remove('no-transitions');
+	});
 })(LinearTextur);
