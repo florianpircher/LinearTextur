@@ -23,6 +23,7 @@ const LinearTextur = (() => {
 			this.fonts = null;  // [Font]?
 			this.matchXHeight = false;  // boolean
 			this.autosizeFontSettings = false;  // boolean
+			this.showFontLabels = false;  // boolean
 		}
 	};
 	

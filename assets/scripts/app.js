@@ -6,6 +6,7 @@
 	const ROW_SPACING_KEY = 'lineartextur.app.preferences.row-spacing';
 	const MATCH_X_HEIGHT_KEY = 'lineartextur.app.preferences.match-x-height';
 	const AUTOSIZE_FONT_SETTINGS_KEY = 'lineartextur.app.preferences.autosize-font-settings';
+	const SHOW_FONT_LABELS_KEY = 'lineartextur.app.preferences.show-font-labels';
 	
 	// Utilitys
 	
@@ -76,6 +77,7 @@
 	const rowSpacingField = document.getElementById('row-spacing-slider');
 	const matchXHeightOption = document.getElementById('match-x-height-option');
 	const autosizeFontSettingsOption = document.getElementById('autosize-font-settings-option');
+	const showFontLabelsOption = document.getElementById('show-font-labels-option');
 	
 	// Parsing
 	
@@ -149,21 +151,24 @@
 	
 	const parseFontsString = (string) => {
 		const matches = string.split(/[\n;]/)
-			.map(x => x.match(/^([^:]*)(?::(.*))?/))
+			.map(x => x.match(/^([^:(]*)(?:\(([^):]*)\)\s*)?(?:(?:\(.*)?:(.*))?/))
 			.filter(x => x !== null);
 		let defaultConfig = LT.FontConfiguration.none;
 		
 		return matches.map((match) => {
 			const fontName = match[1].trim();
-			const fontConfig = match[2] !== undefined
-				? parseFontConfiguration(match[2].trim(), defaultConfig)
+			const fontLabel = match[2] !== undefined
+				? match[2].trim()
+				: null;
+			const fontConfig = match[3] !== undefined
+				? parseFontConfiguration(match[3].trim(), defaultConfig)
 				: defaultConfig;
 			
 			if (fontName === '') {
 				defaultConfig = fontConfig;
 				return null;
 			}
-			return new LT.Font(fontName, null, fontConfig);
+			return new LT.Font(fontName, fontLabel, fontConfig);
 		}).filter(x => x !== null);
 	};
 	
@@ -223,6 +228,29 @@
 			subtree: true,
 		});
 		matrixNode.appendChild(rowNode);
+		
+		// Label Row
+		
+		const labelRowNode = document.createElement('tr');
+		labelRowNode.classList.add('label-row-view');
+		const labelNode = document.createElement('td');
+		labelNode.classList.add('label-view');
+		labelNode.colSpan = renderings.length;
+		labelRowNode.appendChild(labelNode);
+		const labelTextNode = document.createElement('span');
+		labelTextNode.classList.add('label-text-view');
+		labelTextNode.colSpan = renderings.length;
+		labelNode.appendChild(labelTextNode);
+		const font = renderings[0].font;
+		
+		if (font.label !== null) {
+			labelTextNode.textContent = font.label;
+			labelTextNode.title = font.name;
+		} else {
+			labelTextNode.textContent = font.name;
+		}
+		
+		matrixNode.appendChild(labelRowNode);
 	});
 	
 	const matchXHeight = (fonts) => {
@@ -479,5 +507,15 @@
 		
 		field.addEventListener('change', update);
 		initField(AUTOSIZE_FONT_SETTINGS_KEY, x => field.checked = x, update);
+	});
+	interface.addEndpoint(showFontLabelsOption, (field) => {
+		const update = () => {
+			settings.showFontLabels = field.checked;
+			document.body.classList.toggle('show-font-labels', field.checked);
+			save(SHOW_FONT_LABELS_KEY, field.checked);
+		};
+		
+		field.addEventListener('change', update);
+		initField(SHOW_FONT_LABELS_KEY, x => field.checked = x, update);
 	});
 })(LinearTextur);

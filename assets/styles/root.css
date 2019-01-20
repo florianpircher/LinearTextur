@@ -44,6 +44,7 @@
 	--cc-checkbox-border-F: var(--cc-F);
 	--cc-checkbox-bg-A: var(--cc-B);
 	--cc-cell-fallbackfont-fg: var(--cc-D);
+	--cc-row-label-fg: var(--cc-D);
 }
 
 html {
