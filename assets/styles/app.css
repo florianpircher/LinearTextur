@@ -77,13 +77,15 @@
 }
 
 .field-hint {
-	text-align: right;
+	display: flex;
+	margin-top: 0.25em;
 }
 
 .field-hint-link {
 	font-size: var(--size-02);
 	text-decoration: none;
 	color: var(--cc-label-secondary);
+	margin-left: auto;
 }
 .field-hint-link::after {
 	content: ' →';
