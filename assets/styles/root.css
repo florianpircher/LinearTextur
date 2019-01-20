@@ -1,0 +1,58 @@
+@font-face {
+	font-family: 'Adobe NotDef';
+	src: url('../fonts/and-regular.woff2') format('woff2'), url('../fonts/and-regular.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
+}
+
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+:root {
+	--ff-01: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Ubuntu', sans-serif;
+	--ff-02: 'SFMono-Regular', 'Menlo', 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Liberation Mono', 'Consolas', monospace, var(--ff-01);
+	/* sizing */
+	--mod: 1.2;
+	--size-01: 1rem;
+	--size-02: calc(var(--size-01) / var(--mod));
+	/* monochrom palette */
+	--cc-A: #fdfdfd;
+	--cc-B: #f2f2f2;
+	--cc-C: #aaa;
+	--cc-D: #999;
+	--cc-E: #666;
+	--cc-F: #111;
+	/* color palette */
+	--cc-01: var(--cc-F);
+	--cc-02: #ecebe9;
+	--cc-03: #c00;
+	/* named */
+	--cc-field-fg: var(--cc-F);
+	--cc-field-bg: var(--cc-A);
+	--cc-field-border: var(--cc-C);
+	--cc-field-border-F: var(--cc-F);
+	--cc-label-secondary: var(--cc-E);
+	--cc-slider-track: var(--cc-D);
+	--cc-slider-track-F: var(--cc-F);
+	--cc-slider-thumb-bg: var(--cc-A);
+	--cc-slider-thumb-border: var(--cc-C);
+	--cc-checkbox-bg: var(--cc-A);
+	--cc-checkbox-border: var(--cc-C);
+	--cc-checkbox-border-F: var(--cc-F);
+	--cc-checkbox-bg-A: var(--cc-B);
+	--cc-cell-fallbackfont-fg: var(--cc-D);
+}
+
+html {
+	font: 400 100% / 1.2 var(--ff-01);
+	-webkit-text-size-adjust: 100%;
+	text-rendering: optimizeLegibility;
+}
+
+body {
+	color: var(--cc-01);
+	background-color: var(--cc-02);
+}

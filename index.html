@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+	<meta charset="utf-8">
+	<title>Linear Textur</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/assets/styles/root.css">
+	<link rel="stylesheet" href="/assets/styles/app.css">
+	
+	<header class="header">
+		<h1 id="title">Linear Textur</h1>
+		
+		<form id="display-string-form">
+			<label class="label hidden" for="display-string-field">
+				Display Text
+			</label>
+			<input class="field" id="display-string-field"
+				value="name&lt;@&gt;example.org * flower * Endian&lt;&gt;"
+				autocomplete="off"
+				autocorrect="off"
+				autocapitalize="off"
+				spellcheck="false">
+			<div class="field-hint">
+				<a class="field-hint-link" href="#display-string-info">
+					display-text formattings tips
+				</a>
+			</div>
+		</form>
+		
+		<div id="controls">
+			<div class="control">
+				<label class="label type-slider" for="font-size-slider">
+					Font Size
+				</label>
+				<input class="slider" id="font-size-slider" type="range"
+					title="doubleclick to reset"
+					value="2"
+					data-default="2"
+					min="0.2"
+					max="12"
+					step="0.1">
+			</div>
+			<div class="control">
+				<label class="label type-slider" for="column-spacing-slider">
+					Column-Spacing
+				</label>
+				<input class="slider" id="column-spacing-slider" type="range"
+					title="doubleclick to reset"
+					value="1.5"
+					data-default="1.5"
+					min="0"
+					max="3"
+					step="0.025">
+			</div>
+			<div class="control">
+				<label class="label type-slider" for="row-spacing-slider">
+					Row-Spacing
+				</label>
+				<input class="slider" id="row-spacing-slider" type="range"
+					title="doubleclick to reset"
+					value="0.5"
+					data-default="0.5"
+					min="0"
+					max="2"
+					step="0.025">
+			</div>
+		</div>
+		
+		<div id="settings">
+			<label class="label hidden" for="fonts-field">
+				Font Settings
+			</label>
+			<textarea class="field" id="font-settings-field"
+				rows="5"
+				autocomplete="off"
+				autocorrect="off"
+				autocapitalize="off"
+				spellcheck="false"></textarea>
+			<div class="field-hint">
+				<a class="field-hint-link" href="#fonts-info">
+					font settings tips
+				</a>
+			</div>
+		</div>
+		
+		<div id="options">
+			<div class="option">
+				<input class="checkbox" id="match-x-height-option" type="checkbox">
+				<label class="checkbox-box" for="match-x-height-option"></label>
+				<label class="checkbox-label" for="match-x-height-option">Match x-Height</label>
+			</div>
+			<div class="option">
+				<input class="checkbox" id="autosize-font-settings-option" type="checkbox">
+				<label class="checkbox-box" for="autosize-font-settings-option"></label>
+				<label class="checkbox-label" for="autosize-font-settings-option">Autosize Font-Settings</label>
+			</div>
+	</header>
+	
+	<aside class="information" hidden>
+		<h2>Information</h2>
+		
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+	</aside>
+	
+	<main class="content">
+		<div id="matrix"></div>
+	</main>
+	
+	<div id="metrics"></div>
+	
+	<script src="/assets/scripts/models.js"></script>
+	<script src="/assets/scripts/app.js"></script>
+</html>
