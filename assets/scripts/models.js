@@ -1,5 +1,7 @@
 const LinearTextur = (() => {
 	const canvas = document.createElement('canvas');
+	canvas.width = 32;
+	canvas.height = 64;
 	const context = canvas.getContext('2d');
 	const notDefinedFontName = 'Adobe NotDef';
 	
@@ -19,9 +21,10 @@ const LinearTextur = (() => {
 ((LT) => {
 	LT.Settings = class Settings {
 		constructor() {
+			this.drawEnabled = true;  // boolean
 			this.cells = null;  // [Cell]?
 			this.fonts = null;  // [Font]?
-			this.matchXHeight = false;  // boolean
+			this.matchHeightMethod = LT.MatchHeightMethod.bodyHeight;  // LT.MatchHeightMethod
 			this.autosizeFontSettings = false;  // boolean
 			this.showFontLabels = false;  // boolean
 		}
@@ -30,10 +33,27 @@ const LinearTextur = (() => {
 	LT.Interface = class Interface {
 		constructor() {
 			this.endpoints = new Map();
+			this.queue = [];
 		}
 		
-		addEndpoint(field, scope) {
-			this.endpoints.set(field, scope(field));
+		addEndpoint(properties, scope) {
+			this.queue.push({ properties, scope });
+		}
+		
+		processQueue() {
+			let item = null;
+			
+			while (item = this.queue.shift()) {
+				const { properties, scope } = item;
+				this.endpoints.set(properties, scope(properties));
+			}
+		}
+		
+		init(draw, settings) {
+			settings.drawEnabled = false;
+			this.processQueue();
+			settings.drawEnabled = true;
+			draw(settings);
 		}
 	}
 	
@@ -128,6 +148,12 @@ const LinearTextur = (() => {
 				.map(x => x.toCSS())
 				.join(', ');
 		}
+	};
+	
+	LT.MatchHeightMethod = {
+		bodyHeight: Symbol('body-height'),
+		capHeight: Symbol('cap-height'),
+		xHeight: Symbol('x-height'),
 	};
 	
 	LT.Rendering = class Rendering {

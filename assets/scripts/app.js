@@ -4,7 +4,7 @@
 	const FONT_SIZE_KEY = 'lineartextur.app.preferences.font-size';
 	const COLUMN_SPACING_KEY = 'lineartextur.app.preferences.column-spacing';
 	const ROW_SPACING_KEY = 'lineartextur.app.preferences.row-spacing';
-	const MATCH_X_HEIGHT_KEY = 'lineartextur.app.preferences.match-x-height';
+	const MATCH_HEIGHT_METHOD_KEY = 'lineartextur.app.preferences.match-height';
 	const AUTOSIZE_FONT_SETTINGS_KEY = 'lineartextur.app.preferences.autosize-font-settings';
 	const SHOW_FONT_LABELS_KEY = 'lineartextur.app.preferences.show-font-labels';
 	
@@ -53,15 +53,15 @@
 	
 	const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 	const load = (key) => JSON.parse(localStorage.getItem(key));
-	const initField = (key, set, update) => {
+	const initField = (key, set, update, defaultValue = null) => {
 		const initialValue = load(key);
 		
 		if (initialValue !== null) {
 			set(initialValue);
-			update();
-		} else {
-			update();
+		} else if (defaultValue !== null) {
+			set(defaultValue);
 		}
+		update();
 	};
 	const settings = new LT.Settings();
 	const interface = new LT.Interface();
@@ -75,6 +75,8 @@
 	const fontSizeField = document.getElementById('font-size-slider');
 	const columnSpacingField = document.getElementById('column-spacing-slider');
 	const rowSpacingField = document.getElementById('row-spacing-slider');
+	const matchBodyHeightOption = document.getElementById('match-body-height-option');
+	const matchCapHeightOption = document.getElementById('match-cap-height-option');
 	const matchXHeightOption = document.getElementById('match-x-height-option');
 	const autosizeFontSettingsOption = document.getElementById('autosize-font-settings-option');
 	const showFontLabelsOption = document.getElementById('show-font-labels-option');
@@ -251,7 +253,16 @@
 		matrixNode.appendChild(labelRowNode);
 	});
 	
-	const matchXHeight = (fonts) => {
+	const median = (xs) => {
+		xs = [...xs].sort((a, b) => a < b);
+		
+		if (xs.length % 2 === 0) {
+			return (xs[xs.length / 2] + xs[xs.length / 2 - 1]) / 2;
+		}
+		return xs[(xs.length + 1) / 2 - 1];
+	}
+	
+	const matchFontsXHeight = (fonts) => {
 		removeAllChildren(metricsNode);
 		
 		const exNodes = fonts.map((font) => {
@@ -264,15 +275,7 @@
 			const observer = new MutationObserver(() => {
 				if (exNodes.every(node => metricsNode.contains(node))) {
 					const rects = exNodes.map(x => x.getBoundingClientRect());
-					const hs = rects.map(x => x.height);
-					const medianXHeight = (() => {
-						hs.sort((a, b) => a < b);
-						
-						if (hs.length % 2 === 0) {
-							return (hs[hs.length / 2] + hs[hs.length / 2 - 1]) / 2;
-						}
-						return hs[(hs.length + 1) / 2 - 1];
-					})();
+					const medianXHeight = median(rects.map(x => x.height));
 					
 					for (let i = 0; i < fonts.length; i++) {
 						fonts[i].scaleFactor = medianXHeight / rects[i].height;
@@ -297,20 +300,70 @@
 		return metricsPromise;
 	};
 	
-	const draw = async (settings) => {
-		if (settings.cells === null || settings.fonts === null) {
-			return;
+	const matchFontsGlyphHeight = (fonts, glyphs, defaultHeight) => {
+		const width = LT.utility.canvas.width;
+		const height = LT.utility.canvas.height;
+		const ctx = LT.utility.context;
+		const heights = [];
+		
+		for (const font of fonts) {
+			ctx.fillStyle = '#fff';
+			ctx.fillRect(0, 0, width, height);
+			ctx.fillStyle = '#000';
+			ctx.font = `${height}px ${font.name}`;
+			
+			for (const glyph of glyphs) {
+				ctx.fillText(glyph, 0, height);
+			}
+			
+			const subpixels = ctx.getImageData(0, 0, width, height).data;
+			const area = width * height;
+			let firstMatch = defaultHeight * area;
+			
+			for (let c = 0, limit = subpixels.length; c < limit; c += 4) {
+				if (subpixels[c] !== 255) {
+					firstMatch = c / 4;
+					break;
+				}
+			}
+			
+			heights.push(1 - (firstMatch / area));
 		}
 		
-		removeAllChildren(matrixNode);
+		const medianHeight = median(heights);
 		
+		for (let i = 0; i < fonts.length; i++) {
+			fonts[i].scaleFactor = medianHeight / heights[i];
+		}
+		
+		return fonts;
+	}
+	
+	const matchFontsCapHeight = (fonts) => {
+		// TODO: test for support for advanced text metrics
+		return matchFontsGlyphHeight(fonts, ['H', 'X', 'V'], 0.7);
+	};
+	
+	const matchFonts = (fonts, matchMethod) => {
 		for (const font of settings.fonts) {
 			font.scaleFactor = 1; // reset scale factors
 		}
 		
-		if (settings.matchXHeight) {
-			settings.fonts = await matchXHeight(settings.fonts);
+		if (matchMethod === LT.MatchHeightMethod.xHeight) {
+			return matchFontsXHeight(fonts);
 		}
+		else if (matchMethod === LT.MatchHeightMethod.capHeight) {
+			return matchFontsCapHeight(fonts);
+		}
+		return fonts;
+	};
+	
+	const draw = async (settings) => {
+		if (!settings.drawEnabled || settings.cells === null || settings.fonts === null) { return; }
+		
+		settings.fonts = await matchFonts(settings.fonts, settings.matchHeightMethod);
+		
+		removeAllChildren(matrixNode);
 		
 		const renderings = settings.fonts.map(font => render(settings.cells, font));
 		const rows = await Promise.all(renderings.map(drawRow));
@@ -421,7 +474,7 @@
 	
 	// Controls
 	
-	((fz, cs, rs) => {
+	interface.addEndpoint([fontSizeField, columnSpacingField, rowSpacingField], ([fz, cs, rs]) => {
 		const updateFontSize = () => {
 			const value = fz.valueAsNumber;
 			matrixNode.style.setProperty('--setting-font-size', value + 'rem');
@@ -481,19 +534,39 @@
 		initField(FONT_SIZE_KEY, x => fz.value = x, controlHandlerMap.get(fz).update);
 		initField(COLUMN_SPACING_KEY, x => cs.value = x, controlHandlerMap.get(cs).update);
 		initField(ROW_SPACING_KEY, x => rs.value = x, controlHandlerMap.get(rs).update);
-	})(fontSizeField, columnSpacingField, rowSpacingField);
+	});
 	
 	// Options
 	
-	interface.addEndpoint(matchXHeightOption, (field) => {
+	interface.addEndpoint([matchBodyHeightOption, matchCapHeightOption, matchXHeightOption], ([bodyHeight, capHeight, xHeight]) => {
 		const update = () => {
-			settings.matchXHeight = field.checked;
+			let method = null;
+			
+			if (capHeight.checked) {
+				method = LT.MatchHeightMethod.capHeight;
+			} else if (xHeight.checked) {
+				method = LT.MatchHeightMethod.xHeight;
+			} else {
+				method = LT.MatchHeightMethod.bodyHeight;
+			}
+			
+			settings.matchHeightMethod = method;
 			draw(settings);
-			save(MATCH_X_HEIGHT_KEY, field.checked);
+			save(MATCH_HEIGHT_METHOD_KEY, method.description);
 		};
 		
-		field.addEventListener('change', update);
-		initField(MATCH_X_HEIGHT_KEY, x => field.checked = x, update);
+		bodyHeight.addEventListener('change', update);
+		capHeight.addEventListener('change', update);
+		xHeight.addEventListener('change', update);
+		initField(MATCH_HEIGHT_METHOD_KEY, (initValue) => {
+			if (initValue === LT.MatchHeightMethod.capHeight.description) {
+				capHeight.checked = true;
+			} else if (initValue === LT.MatchHeightMethod.xHeight.description) {
+				xHeight.checked = true;
+			} else {
+				bodyHeight.checked = true;
+			}
+		}, update, LT.MatchHeightMethod.bodyHeight);
 	});
 	interface.addEndpoint(autosizeFontSettingsOption, (field) => {
 		const update = () => {
@@ -522,4 +595,5 @@
 	window.addEventListener('load', () => {
 		document.documentElement.classList.remove('no-transitions');
 	});
+	interface.init(draw, settings);
 })(LinearTextur);

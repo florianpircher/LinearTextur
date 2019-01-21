@@ -83,20 +83,40 @@
 		</div>
 		
 		<div id="options">
-			<div class="option">
-				<input class="checkbox" id="match-x-height-option" type="checkbox">
-				<label class="checkbox-box" for="match-x-height-option"></label>
-				<label class="checkbox-label" for="match-x-height-option">Match x-Height</label>
-			</div>
-			<div class="option">
+			<div class="preference option">
+				<label class="checkbox-button" for="autosize-font-settings-option"></label>
 				<input class="checkbox" id="autosize-font-settings-option" type="checkbox">
 				<label class="checkbox-box" for="autosize-font-settings-option"></label>
 				<label class="checkbox-label" for="autosize-font-settings-option">Autosize Font-Settings</label>
 			</div>
-			<div class="option">
+			<div class="preference option">
+				<label class="checkbox-button" for="show-font-labels-option"></label>
 				<input class="checkbox" id="show-font-labels-option" type="checkbox">
 				<label class="checkbox-box" for="show-font-labels-option"></label>
 				<label class="checkbox-label" for="show-font-labels-option">Show Font-Labels</label>
+			</div>
+			<div class="preference radios">
+				<div class="radios-label">Match:</div>
+				<div class="radios-options">
+					<div class="option">
+						<label class="radio-button" for="match-body-height-option"></label>
+						<input class="radio" id="match-body-height-option" type="radio" name="match-height-option">
+						<label class="radio-box" for="match-body-height-option"></label>
+						<label class="radio-label" for="match-body-height-option">body height</label>
+					</div>
+					<div class="option">
+						<label class="radio-button" for="match-cap-height-option"></label>
+						<input class="radio" id="match-cap-height-option" type="radio" name="match-height-option">
+						<label class="radio-box" for="match-cap-height-option"></label>
+						<label class="radio-label" for="match-cap-height-option">cap height</label>
+					</div>
+					<div class="option">
+						<label class="radio-button" for="match-x-height-option"></label>
+						<input class="radio" id="match-x-height-option" type="radio" name="match-height-option">
+						<label class="radio-box" for="match-x-height-option"></label>
+						<label class="radio-label" for="match-x-height-option">x-height</label>
+					</div>
+				</div>
 			</div>
 	</header>
 	
