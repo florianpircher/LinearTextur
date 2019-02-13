@@ -264,7 +264,7 @@
 	content: '';
 	width: 8px;
 	height: 8px;
-	background-color: #525252;
+	background-color: var(--cc-checkbox-radio-dot);
 	border-radius: 50%;
 	top: 5px;
 	left: 5px;
