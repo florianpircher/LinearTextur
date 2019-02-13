@@ -20,10 +20,12 @@
 	--size-02: calc(var(--size-01) / var(--mod));
 	/* monochrom palette */
 	--cc-A: #fdfdfd;
-	--cc-B: #f2f2f2;
+	--cc-A-a1: #f2f2f2;
 	--cc-C: #aaa;
-	--cc-D: #999;
-	--cc-E: #666;
+	--cc-C-a1: #999;
+	--cc-D-d1: #777;
+	--cc-D: #666;
+	--cc-D-a1: #525252;
 	--cc-F: #111;
 	/* color palette */
 	--cc-01: var(--cc-F);
@@ -34,17 +36,18 @@
 	--cc-field-bg: var(--cc-A);
 	--cc-field-border: var(--cc-C);
 	--cc-field-border-F: var(--cc-F);
-	--cc-label-secondary: var(--cc-E);
-	--cc-slider-track: var(--cc-D);
+	--cc-label-secondary: var(--cc-D);
+	--cc-slider-track: var(--cc-C-a1);
 	--cc-slider-track-F: var(--cc-F);
 	--cc-slider-thumb-bg: var(--cc-A);
-	--cc-slider-thumb-border: var(--cc-C);
+	--cc-slider-thumb-border: var(--cc-D-d1);
 	--cc-checkbox-bg: var(--cc-A);
+	--cc-checkbox-bg-A: var(--cc-A-a1);
 	--cc-checkbox-border: var(--cc-C);
 	--cc-checkbox-border-F: var(--cc-F);
-	--cc-checkbox-bg-A: var(--cc-B);
-	--cc-cell-fallbackfont-fg: var(--cc-D);
-	--cc-row-label-fg: var(--cc-D);
+	--cc-checkbox-radio-dot: var(--cc-D-a1);
+	--cc-cell-fallbackfont-fg: var(--cc-C-a1);
+	--cc-row-label-fg: var(--cc-C-a1);
 }
 
 html {
