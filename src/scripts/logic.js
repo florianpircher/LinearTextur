@@ -108,7 +108,7 @@ const scanGlyphsHeight = (glyphs, defaultHeight) => (font) => {
 	ctx.fillStyle = '#fff';
 	ctx.fillRect(0, 0, width, height);
 	ctx.fillStyle = '#000';
-	ctx.font = `${height}px ${font.get('name')}`;
+	ctx.font = `${height}px ${font.get('name')}, ${LT.storage.fontStacks.standard}`;
 	
 	// Draw glyphs on top of each other
 	for (const glyph of glyphs) {
