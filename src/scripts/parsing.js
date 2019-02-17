@@ -76,10 +76,8 @@ const constructTextCells = symbols =>
 //
 
 const parseFontConfiguration = (string, defaultConfig) => {
-	const parts = string.split(/[\s,]+/);
-	let weight = defaultConfig.weight;
-	let style = defaultConfig.style;
-	const features = [...defaultConfig.features];
+	const parts = string.split(/[\s,]+/).filter(x => x !== '');
+	const config = new LT.Timeline(defaultConfig);
 	
 	for (const part of parts) {
 		let completeWeight;
@@ -87,25 +85,26 @@ const parseFontConfiguration = (string, defaultConfig) => {
 		
 		if ((completeWeight = complete(part, ['bold'])) !== null) {
 			// weight keyword
-			weight = completeWeight;
+			config.set('weight', completeWeight);
 		}
 		else if (/^\d{3}$/.test(part)) {
 			// weight number
-			weight = part;
+			config.set('weight', part);
 		}
 		else if ((completeStyle = complete(part, ['italic', 'oblique'])) !== null) {
 			// style keyword
-			style = completeStyle;
+			config.set('style', completeStyle);
 		}
 		else if (/^[+-]\S{4}$/.test(part)) {
 			// OpenType feature tag
 			const tag = part.slice(1, 5);
 			const enabled = part[0] === '+';
-			features.push(new LT.FontFeature(tag, enabled));
+			const ff = LT.FontFeature({ tag, enabled });
+			config.set('features', config.get('features').push(ff));
 		}
 	}
 	
-	return new LT.FontConfiguration(weight, style, features);
+	return config.access();
 };
 
 const parseFontsString = (string) => string.split(/[\n;]/)
@@ -113,17 +112,17 @@ const parseFontsString = (string) => string.split(/[\n;]/)
 	.map(x => x.match(/^([^:(]*)(?:\(([^):]*)\)\s*)?(?:(?:\(.*)?:(.*))?/))
 	.filter(x => x !== null)
 	.reduce(([matches, defaultConfig], [, rawName, rawLabel, rawConfig]) => {
-		const fontName = rawName.trim();
-		const fontLabel = rawLabel !== undefined
+		const name = rawName.trim();
+		const label = rawLabel !== undefined
 			? rawLabel.trim()
 			: null;
-		const fontConfig = rawConfig !== undefined
+		const config = rawConfig !== undefined
 			? parseFontConfiguration(rawConfig.trim(), defaultConfig)
 			: defaultConfig;
 		
-		if (fontName === '') {
-			return [matches, fontConfig];
+		if (name === '') {
+			return [matches, config];
 		}
-		const font = new LT.Font(fontName, fontLabel, fontConfig);
-		return [matches.concat(font), defaultConfig];
-	}, [[], LT.FontConfiguration.none])[0];
+		const font = LT.Font({ name, label, config });
+		return [matches.push(font), defaultConfig];
+	}, [Immutable.List(), LT.FontConfiguration()])[0];

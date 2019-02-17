@@ -32,8 +32,8 @@ const initField = (key, set, update, defaultValue = null) => {
 	}
 	update();
 };
-const settings = new LT.Settings();
 const main = new LT.Interface();
+const memory = new LT.Timeline(LT.State());
 
 // DOM Nodes
 const elements = {
@@ -62,7 +62,7 @@ const observeNodeTree = {
 
 const renderTestNode = (height) => (font) => {
 	const testNode = document.createElement('div');
-	font.applyTo(testNode, { fallback: LT.storage.fontStacks.standard });
+	applyFontToElement(font, testNode, LT.storage.fontStacks.standard);
 	testNode.style.height = height;
 	
 	return testNode;
@@ -140,7 +140,7 @@ const manuelMatchFontsCapHeight = fonts =>
 const scalarsForMatchingFonts = (fonts, matchMethod) => {
 	switch (matchMethod) {
 	case LT.MatchHeightMethod.bodyHeight:
-		return new Array(fonts.length).fill(1);
+		return Immutable.Repeat(1, fonts.length);
 	case LT.MatchHeightMethod.capHeight:
 		// TODO: test for support for advanced text metrics
 		return manuelMatchFontsCapHeight(fonts);
@@ -154,19 +154,8 @@ const scalarsForMatchingFonts = (fonts, matchMethod) => {
 }
 
 const matchFonts = async (fonts, matchMethod) => {
-	for (const font of settings.fonts) {
-		// FIXME: mutation
-		font.scaleFactor = 1; // reset scale factors
-	}
-	
 	const scalars = await scalarsForMatchingFonts(fonts, matchMethod);
-	
-	for (const [i, scalar] of scalars.entries()) {
-		// FIXME: mutation
-		fonts[i].scaleFactor = scalar;
-	}
-	
-	return fonts;
+	return fonts.map((font, idx) => font.set('scaleFactor', scalars.get(idx)));
 };
 
 const renderSpan = (span) => {
@@ -187,12 +176,12 @@ const render = (cells, font) => new LT.Row(font, cells.map((cell) => {
 	textWrapper.classList.add('cell-text-view');
 	element.appendChild(textWrapper);
 	
-	if (font.exists) {
+	if (fontExists(font)) {
 		// set cell using the requested font
-		font.applyTo(textWrapper);
+		applyFontToElement(font, textWrapper, LT.storage.fontStacks.notDefined);
 	} else {
 		// set the sell using the fallback font
-		LT.Font.fallbackFont.applyTo(textWrapper);
+		applyFontToElement(fallbackFont, textWrapper, LT.storage.fontStacks.standard);
 		textWrapper.classList.add('fallback-font');
 	}
 	
@@ -241,15 +230,17 @@ const alignColumn = (column) => {
 	}
 };
 
-const draw = async (settings) => {
-	if (!settings.drawEnabled || settings.cells === null || settings.fonts === null) { return; }
+const draw = async (state) => {
+	// if (!state.get('drawingEnabled')) return;
 	
-	const unmatchedFonts = settings.fonts;
-	const fonts = await matchFonts(settings.fonts, settings.matchHeightMethod);
+	const unmatchedFonts = state.get('fonts');
+	const matchMethod = state.get('matchHeightMethod');
+	const fonts = await matchFonts(unmatchedFonts, matchMethod);
 	
 	removeAllChildren(elements.matrix);
 	
-	const renderings = fonts.map(font => render(settings.cells, font));
+	const cells = memory.get('cells');
+	const renderings = fonts.map(font => render(cells, font));
 	const rows = await Promise.all(renderings.map(drawRow));
 	const matrix = new LT.Matrix(rows);
 	
@@ -265,8 +256,8 @@ const draw = async (settings) => {
 main.addEndpoint(elements.input, (field) => {
 	const update = () => {
 		const dsSymbols = parseInput(field.value);
-		settings.cells = constructTextCells(dsSymbols);
-		draw(settings);
+		memory.set('cells', constructTextCells(dsSymbols));
+		draw(memory.access());
 		save(STRING_KEY, field.value);
 	};
 	
@@ -322,27 +313,15 @@ main.addEndpoint(elements.input, (field) => {
 // Font Settings Field
 
 main.addEndpoint(elements.fontSettings, (field) => {
-	const autosize = () => {
-		if (settings.autosizeFontSettings) {
-			field.style.height = 'auto';
-			field.style.height = field.scrollHeight + 'px';
-		} else {
-			field.style.removeProperty('height');
-		}
-	};
-	
 	const update = () => {
-		settings.fonts = parseFontsString(field.value);
-		draw(settings);
-		autosize();
+		memory.set('fonts', parseFontsString(field.value));
+		draw(memory);
 		save(FONTS_KEY, field.value);
 	};
 	
 	field.style.height = field.scrollHeight + 'px';
 	field.addEventListener('input', update);
 	initField(FONTS_KEY, x => field.value = x, update);
-	
-	return { autosize };
 });
 
 // Controls
@@ -352,19 +331,19 @@ main.addEndpoint([elements.fontSize, elements.columnSpacing, elements.rowSpacing
 		const value = fz.valueAsNumber;
 		elements.matrix.style.setProperty('--setting-font-size', value + 'rem');
 		save(FONT_SIZE_KEY, value);
-		draw(settings);
+		draw(memory.access());
 	};
 	const updateColumnSpacing = () => {
 		const value = cs.valueAsNumber;
 		elements.matrix.style.setProperty('--setting-column-spacing', value + 'em');
 		save(COLUMN_SPACING_KEY, value);
-		draw(settings);
+		draw(memory.access());
 	};
 	const updateRowSpacing = () => {
 		const value = rs.valueAsNumber;
 		elements.matrix.style.setProperty('--setting-row-spacing', value + 'em');
 		save(ROW_SPACING_KEY, value);
-		draw(settings);
+		draw(memory.access());
 	};
 	
 	const setFontSize = (value) => {
@@ -423,8 +402,8 @@ main.addEndpoint([elements.matchBodyHeight, elements.matchCapHeight, elements.ma
 			method = LT.MatchHeightMethod.bodyHeight;
 		}
 		
-		settings.matchHeightMethod = method;
-		draw(settings);
+		memory.set('matchHeightMethod', method);
+		draw(memory.access());
 		save(MATCH_HEIGHT_METHOD_KEY, method.description);
 	};
 	
@@ -447,4 +426,4 @@ main.addEndpoint([elements.matchBodyHeight, elements.matchCapHeight, elements.ma
 window.addEventListener('load', () => {
 	document.documentElement.classList.remove('no-transitions');
 });
-main.init(draw, settings);
+main.init(draw, memory);

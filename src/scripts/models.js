@@ -1,11 +1,36 @@
-LT.Settings = class Settings {
-	constructor() {
-		this.drawEnabled = true;  // boolean
-		this.cells = [];  // [Cell]
-		this.fonts = [];  // [Font]
-		this.matchHeightMethod = LT.MatchHeightMethod.bodyHeight;  // LT.MatchHeightMethod
-		this.autosizeFontSettings = false;  // boolean
-		this.showFontLabels = false;  // boolean
+LT.Timeline = class Timeline {
+	constructor(initValue = undefined) {
+		this.time = new WeakMap();
+		this.arrow = { time: 0 };
+		
+		if (initValue !== undefined) {
+			this.commit(initValue);
+		}
+	}
+	
+	commit(state) {
+		this.arrow = { time: this.arrow.time + 1 };
+		this.time.set(this.arrow, state);
+		return this.arrow;
+	}
+	
+	has(arrow) {
+		return this.time.has(arrow);
+	}
+	
+	access(arrow = undefined) {
+		if (arrow === undefined) {
+			return this.time.get(this.arrow);
+		}
+		return this.time.get(arrow);
+	}
+	
+	set(key, value) {
+		return this.commit(this.access().set(key, value));
+	}
+	
+	get(key) {
+		return this.access().get(key);
 	}
 };
 
@@ -28,11 +53,11 @@ LT.Interface = class Interface {
 		}
 	}
 	
-	init(draw, settings) {
-		settings.drawEnabled = false;
+	init(draw, memory) {
+		memory.set('drawingEnabled', false);
 		this.processQueue();
-		settings.drawEnabled = true;
-		draw(settings);
+		memory.set('drawingEnabled', true);
+		draw(memory.access());
 	}
 };
 
@@ -49,84 +74,60 @@ LT.Text = class Text {
 	}
 };
 
-LT.FontFeature = class FontFeature {
-	constructor(tag, enabled) {
-		this.tag = tag;  // string
-		this.enabled = enabled;  // boolean
+LT.FontFeature = Immutable.Record({
+	tag: null,
+	enabled: null,
+});
+
+LT.FontConfiguration = Immutable.Record({
+	weight: null, // string?, e.g. "400" or "bold"
+	style: null, // string?, e.g. "italic" or "oblique"
+	features: Immutable.List(), // [FontFeature]
+});
+
+LT.Font = Immutable.Record({
+	name: null, // string, e.g. "Futura" or "ArnoPro-Display"
+	label: null, // string?
+	config: LT.FontConfiguration(), // FontConfiguration
+	scaleFactor: 1, // number, scale factor for when drawing the font
+});
+
+const fallbackFont = LT.Font({ name: LT.storage.fontStacks.standard });
+const notDefinedFont = LT.Font({ name: LT.storage.fontStacks.notDefined });
+
+const idFont = (font) => {
+	LT.drawing.context.font = `32px ${font.get('name')}, ${LT.storage.fontStacks.standard}`;
+	let id = 0;
+	
+	for (const char of [...LT.storage.measureText, LT.storage.measureText]) {
+		const measure = LT.drawing.context.measureText(char);
+		id += measure.width;
 	}
 	
-	toCSS() {
-		return `'${this.tag}' ${this.enabled ? 'on' : 'off'}`;
-	}
+	return id;
 };
 
-LT.FontConfiguration = class FontConfiguration {
-	constructor(weight, style, features) {
-		this.weight = weight;  // string?, e.g. "400" or "bold"
-		this.style = style;  // string?, e.g. "italic" or "oblique"
-		this.features = features;  // [FontFeature]
-	}
-	
-	static get none() {
-		return new LT.FontConfiguration(null, null, []);
-	}
+const fontExists = (font) => {
+	const testFont = LT.Font({ name: `${font.get('name')}, ${LT.storage.fontStacks.notDefined}` });
+	return idFont(testFont) !== idFont(notDefinedFont);
 };
 
-LT.Font = class Font {
-	constructor(name, label, config) {
-		this.name = name;  // string, e.g. "Futura" or "ArnoPro-Display"
-		this.label = label;  // string?
-		this.config = config;  // FontConfiguration
-		this.scaleFactor = 1;  // number, scale factor for when drawing the font
+const applyFontToElement = (font, element, fontStack) => {
+	element.style.fontFamily = `${font.get('name')}, ${fontStack}`;
+	element.style.fontSize = `${font.get('scaleFactor')}em`;
+	const config = font.get('config');
+	
+	if (config.get('weight') !== null) {
+		element.style.fontWeight = config.get('weight');
+	}
+	if (config.get('style') !== null) {
+		element.style.fontStyle = config.get('style');
 	}
 	
-	static plain(name) {
-		return new LT.Font(name, null, LT.FontConfiguration.none);
-	}
-	
-	static get fallbackFont() {
-		return LT.Font.plain(LT.storage.fontStacks.standard);
-	}
-	
-	static get notDefinedFont() {
-		return LT.Font.plain(LT.storage.fontStacks.notDefined);
-	}
-	
-	get id() {
-		let id = 0;
-		
-		LT.drawing.context.font = `32px ${this.name}, ${LT.storage.fontStacks.standard}`;
-		
-		for (const char of [...LT.storage.measureText, LT.storage.measureText]) {
-			const measure = LT.drawing.context.measureText(char);
-			
-			id += measure.width;
-		}
-		
-		return id;
-	}
-	
-	get exists() {
-		const testFont = LT.Font.plain(`${this.name}, ${LT.storage.fontStacks.notDefined}`);
-		return testFont.id !== LT.Font.notDefinedFont.id;
-	}
-	
-	applyTo(element, { fallback = LT.storage.fontStacks.notDefined } = {}) {
-		element.style.fontFamily = `${this.name}, ${fallback}`;
-		element.style.fontSize = `${this.scaleFactor}em`;
-		
-		if (this.config.weight !== null) {
-			element.style.fontWeight = this.config.weight;
-		}
-		if (this.config.style !== null) {
-			element.style.fontStyle = this.config.style;
-		}
-		
-		element.style.fontFeatureSettings = this.config.features
-			.map(x => x.toCSS())
-			.join(', ');
-	}
-};
+	element.style.fontFeatureSettings = config.get('features')
+		.map(x => `'${x.get('tag')}' ${x.get('enabled') ? 'on' : 'off'}`)
+		.join(', ');
+}
 
 LT.MatchHeightMethod = {
 	bodyHeight: Symbol('body-height'),
@@ -314,3 +315,10 @@ LT.Symbols = class Symbols {
 		return this.symbols.join('');
 	}
 };
+
+LT.State = Immutable.Record({
+	drawEnabled: false,
+	cells: Immutable.List(),
+	fonts: Immutable.List(),
+	matchHeightMethod: LT.MatchHeightMethod.bodyHeight,
+});
