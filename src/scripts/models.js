@@ -74,59 +74,56 @@ LT.Text = class Text {
 	}
 };
 
-LT.FontFeature = Immutable.Record({
-	tag: null,
-	enabled: null,
-});
+//
+// Fonts
+//
 
-LT.FontConfiguration = Immutable.Record({
-	weight: null, // string?, e.g. "400" or "bold"
-	style: null, // string?, e.g. "italic" or "oblique"
-	features: Immutable.List(), // [FontFeature]
-});
+// FontConfiguration: Map
+// - weight: string, e.g. "400" or "bold"
+// - style: string, e.g. "italic" or "oblique"
+// - features: Map{string : boolean}
+//   - key: 4 character OpenType feature name
+//   - value: whether the feature is enabled or disabled
 
-LT.Font = Immutable.Record({
-	name: null, // string, e.g. "Futura" or "ArnoPro-Display"
-	label: null, // string?
-	config: LT.FontConfiguration(), // FontConfiguration
-	scaleFactor: 1, // number, scale factor for when drawing the font
-});
+// Font: Map
+// - name: string, e.g. "Futura" or "ArnoPro-Display"
+// - label: string
+// - config: FontConfiguration
+// - scaleFactor: number, scale factor for when drawing the font, > 0
 
-const fallbackFont = LT.Font({ name: LT.storage.fontStacks.standard });
-const notDefinedFont = LT.Font({ name: LT.storage.fontStacks.notDefined });
+const fallbackFont = Map({ name: LT.storage.fontStacks.standard });
+const notDefinedFont = Map({ name: LT.storage.fontStacks.notDefined });
 
 const idFont = (font) => {
 	LT.drawing.context.font = `32px ${font.get('name')}, ${LT.storage.fontStacks.standard}`;
-	let id = 0;
-	
-	for (const char of [...LT.storage.measureText, LT.storage.measureText]) {
-		const measure = LT.drawing.context.measureText(char);
-		id += measure.width;
-	}
-	
-	return id;
+	return [...'xghAW.*|&?', 'LVAW.Y+T'].reduce((id, x) =>
+		id + LT.drawing.context.measureText(x).width, 0);
 };
 
 const fontExists = (font) => {
-	const testFont = LT.Font({ name: `${font.get('name')}, ${LT.storage.fontStacks.notDefined}` });
+	const testFont = Map({ name: `${font.get('name')}, ${LT.storage.fontStacks.notDefined}` });
 	return idFont(testFont) !== idFont(notDefinedFont);
 };
 
 const applyFontToElement = (font, element, fontStack) => {
 	element.style.fontFamily = `${font.get('name')}, ${fontStack}`;
 	element.style.fontSize = `${font.get('scaleFactor')}em`;
-	const config = font.get('config');
 	
-	if (config.get('weight') !== null) {
-		element.style.fontWeight = config.get('weight');
+	if (font.has('config')) {
+		const config = font.get('config');
+		
+		if (config.has('weight')) {
+			element.style.fontWeight = config.get('weight');
+		}
+		if (config.has('style')) {
+			element.style.fontStyle = config.get('style');
+		}
+		if (config.has('features')) {
+			element.style.fontFeatureSettings = config.get('features')
+				.map((enabled, tag) => `'${tag}' ${enabled ? 'on' : 'off'}`)
+				.join(', ');
+		}
 	}
-	if (config.get('style') !== null) {
-		element.style.fontStyle = config.get('style');
-	}
-	
-	element.style.fontFeatureSettings = config.get('features')
-		.map(x => `'${x.get('tag')}' ${x.get('enabled') ? 'on' : 'off'}`)
-		.join(', ');
 }
 
 LT.MatchHeightMethod = {
@@ -318,7 +315,7 @@ LT.Symbols = class Symbols {
 
 LT.State = Immutable.Record({
 	drawEnabled: false,
-	cells: Immutable.List(),
-	fonts: Immutable.List(),
+	cells: List(),
+	fonts: List(),
 	matchHeightMethod: LT.MatchHeightMethod.bodyHeight,
 });

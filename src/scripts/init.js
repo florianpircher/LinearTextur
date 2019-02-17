@@ -13,8 +13,8 @@ const LinearTextur = (() => {
 				notDefined: `"${notDefinedFontName}", monospace`,
 			},
 			notDefinedFontName: notDefinedFontName,
-			measureText: 'xghAW.*|&?',
 		},
 	};
 })();
 const LT = LinearTextur;
+const { List, Map } = Immutable;

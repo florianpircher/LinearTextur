@@ -77,7 +77,7 @@ const constructTextCells = symbols =>
 
 const parseFontConfiguration = (string, defaultConfig) => {
 	const parts = string.split(/[\s,]+/).filter(x => x !== '');
-	const config = new LT.Timeline(defaultConfig);
+	let config = defaultConfig;
 	
 	for (const part of parts) {
 		let completeWeight;
@@ -85,26 +85,25 @@ const parseFontConfiguration = (string, defaultConfig) => {
 		
 		if ((completeWeight = complete(part, ['bold'])) !== null) {
 			// weight keyword
-			config.set('weight', completeWeight);
+			config = config.set('weight', completeWeight);
 		}
 		else if (/^\d{3}$/.test(part)) {
 			// weight number
-			config.set('weight', part);
+			config = config.set('weight', part);
 		}
 		else if ((completeStyle = complete(part, ['italic', 'oblique'])) !== null) {
 			// style keyword
-			config.set('style', completeStyle);
+			config = config.set('style', completeStyle);
 		}
 		else if (/^[+-]\S{4}$/.test(part)) {
 			// OpenType feature tag
 			const tag = part.slice(1, 5);
 			const enabled = part[0] === '+';
-			const ff = LT.FontFeature({ tag, enabled });
-			config.set('features', config.get('features').push(ff));
+			config = config.update('features', Map(), x => x.set(tag, enabled));
 		}
 	}
 	
-	return config.access();
+	return config;
 };
 
 const parseFontsString = (string) => string.split(/[\n;]/)
@@ -123,6 +122,6 @@ const parseFontsString = (string) => string.split(/[\n;]/)
 		if (name === '') {
 			return [matches, config];
 		}
-		const font = LT.Font({ name, label, config });
+		const font = Map({ name, label, config });
 		return [matches.push(font), defaultConfig];
-	}, [Immutable.List(), LT.FontConfiguration()])[0];
+	}, [List(), Map()])[0];
