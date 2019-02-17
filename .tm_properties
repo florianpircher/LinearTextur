@@ -1,1 +1,1 @@
-exclude = "{$exclude,assets/scripts,index.html}"
+exclude = "{$exclude,assets/scripts}"
