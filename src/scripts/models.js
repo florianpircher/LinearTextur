@@ -74,22 +74,39 @@ LT.Text = class Text {
 	}
 };
 
-//
-// Fonts
-//
+/***
 
-// FontConfiguration: Map
-// - weight: string, e.g. "400" or "bold"
-// - style: string, e.g. "italic" or "oblique"
-// - features: Map{string : boolean}
-//   - key: 4 character OpenType feature name
-//   - value: whether the feature is enabled or disabled
+#(section [Fonts])
 
-// Font: Map
-// - name: string, e.g. "Futura" or "ArnoPro-Display"
-// - label: string
-// - config: FontConfiguration
-// - scaleFactor: number, scale factor for when drawing the font, > 0
+A \(term {font}) is an instance of a typeface. Its form closely models the font description of CSS. The file to be used is selecte by the \(key `name`) and may be altered by specifying a weight- and/or style-varient using the \(key `config`). The font configuration also allows to select OpenType display variants.
+
+A label can be provided, which is used instead of the name for display purposes. An optional scale-factor may be specified to scale text rendered using the font. If no scale factor is provided a value of 1 (no scaling) is to be assumed.
+
+Note that font files may not be reachable before the document fully loaded. Therefore some operations, such as measuring font metrics, might not work during page load.
+
+#('font-weight def .string{:ex ("400" "bold")})
+#('font-style def .string{:ex ("italic" "oblique")})
+#('opentype-tag def .string{:length 4, :ex ("smcp" "dlig")})
+#('font-features def .map{:keys {*opentype-tag *boolean}})
+#('font-config def .map{:keys {
+	"weight" *font-weight
+	"style" *font-style
+	"features" *font-features}})
+
+#('font-name def .string{
+	:ex ("Futura" "ArnoPro-Display")
+	:desc "CSS font-name, typically the PostScript name of the font"})
+#('font-label def .string{:ex ("Futura" "Arno (Display)")})
+#('font-scale-factor def .number{ 
+	:ex (0.7, 1.0, 1.2)
+	:desc "scale factor for when drawing the font"})
+#('font def .map{:keys {
+	"name" *font-name
+	"label" *font-label
+	"config" *font-config
+	"scaleFactor" *font-scale-factor}})
+
+***/
 
 const fallbackFont = IMap({ name: LT.storage.fontStacks.standard });
 const notDefinedFont = IMap({ name: LT.storage.fontStacks.notDefined });
