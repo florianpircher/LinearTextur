@@ -33,7 +33,12 @@ const initField = (key, set, update, defaultValue = null) => {
 	update();
 };
 const main = new LT.Interface();
-const memory = new LT.Timeline(LT.State());
+const state = LT.State = {
+	drawEnabled: false,
+	cells: {},
+	fonts: {},
+	matchHeightMethod: LT.MatchHeightMethod.bodyHeight,
+};
 
 // DOM Nodes
 const elements = {
@@ -108,7 +113,7 @@ const scanGlyphsHeight = (glyphs, defaultHeight) => (font) => {
 	ctx.fillStyle = '#fff';
 	ctx.fillRect(0, 0, width, height);
 	ctx.fillStyle = '#000';
-	ctx.font = `${height}px ${font.get('name')}, ${LT.storage.fontStacks.standard}`;
+	ctx.font = `${height}px ${font.name}, ${LT.storage.fontStacks.standard}`;
 	
 	// Draw glyphs on top of each other
 	for (const glyph of glyphs) {
@@ -140,7 +145,7 @@ const manuelMatchFontsCapHeight = fonts =>
 const scalarsForMatchingFonts = (fonts, matchMethod) => {
 	switch (matchMethod) {
 	case LT.MatchHeightMethod.bodyHeight:
-		return Immutable.Repeat(1, fonts.length);
+		return new Array(fonts.length).fill(1);
 	case LT.MatchHeightMethod.capHeight:
 		// TODO: test for support for advanced text metrics
 		return manuelMatchFontsCapHeight(fonts);
@@ -155,7 +160,10 @@ const scalarsForMatchingFonts = (fonts, matchMethod) => {
 
 const matchFonts = async (fonts, matchMethod) => {
 	const scalars = await scalarsForMatchingFonts(fonts, matchMethod);
-	return fonts.map((font, idx) => font.set('scaleFactor', scalars.get(idx)));
+	return fonts.map((font, idx) => {
+		font.scaleFactor = scalars[idx];
+		return font;
+	});
 };
 
 const renderSpan = (span) => {
@@ -231,15 +239,15 @@ const alignColumn = (column) => {
 };
 
 const draw = async (state) => {
-	// if (!state.get('drawingEnabled')) return;
+	if (!state.drawingEnabled) return;
 	
-	const unmatchedFonts = state.get('fonts');
-	const matchMethod = state.get('matchHeightMethod');
+	const unmatchedFonts = state.fonts;
+	const matchMethod = state.matchHeightMethod;
 	const fonts = await matchFonts(unmatchedFonts, matchMethod);
 	
 	removeAllChildren(elements.matrix);
 	
-	const cells = memory.get('cells');
+	const cells = state.cells;
 	const renderings = fonts.map(font => render(cells, font));
 	const rows = await Promise.all(renderings.map(drawRow));
 	const matrix = new LT.Matrix(rows);
@@ -256,18 +264,12 @@ const draw = async (state) => {
 main.addEndpoint(elements.input, (field) => {
 	const update = () => {
 		const dsSymbols = parseInput(field.value);
-		memory.set('cells', constructTextCells(dsSymbols));
-		draw(memory.access());
+		state.cells = constructTextCells(dsSymbols);
+		draw(state);
 		save(STRING_KEY, field.value);
 	};
 	
 	field.addEventListener('input', update);
-	field.addEventListener('focus', () => {
-		document.documentElement.classList.add('active-display-field');
-	});
-	field.addEventListener('blur', () => {
-		document.documentElement.classList.remove('active-display-field');
-	});
 	field.addEventListener('keydown', (event) => {
 		const key = event.which || event.keyCode;
 		
@@ -314,8 +316,8 @@ main.addEndpoint(elements.input, (field) => {
 
 main.addEndpoint(elements.fontSettings, (field) => {
 	const update = () => {
-		memory.set('fonts', parseFontsString(field.value));
-		draw(memory);
+		state.fonts = parseFontsString(field.value);
+		draw(state);
 		save(FONTS_KEY, field.value);
 	};
 	
@@ -329,21 +331,19 @@ main.addEndpoint(elements.fontSettings, (field) => {
 main.addEndpoint([elements.fontSize, elements.columnSpacing, elements.rowSpacing], ([fz, cs, rs]) => {
 	const updateFontSize = () => {
 		const value = fz.valueAsNumber;
-		elements.matrix.style.setProperty('--setting-font-size', value + 'rem');
+		elements.matrix.style.setProperty('--setting-font-size', value + 'em');
 		save(FONT_SIZE_KEY, value);
-		draw(memory.access());
+		draw(state);
 	};
 	const updateColumnSpacing = () => {
 		const value = cs.valueAsNumber;
 		elements.matrix.style.setProperty('--setting-column-spacing', value + 'em');
 		save(COLUMN_SPACING_KEY, value);
-		draw(memory.access());
 	};
 	const updateRowSpacing = () => {
 		const value = rs.valueAsNumber;
 		elements.matrix.style.setProperty('--setting-row-spacing', value + 'em');
 		save(ROW_SPACING_KEY, value);
-		draw(memory.access());
 	};
 	
 	const setFontSize = (value) => {
@@ -402,8 +402,8 @@ main.addEndpoint([elements.matchBodyHeight, elements.matchCapHeight, elements.ma
 			method = LT.MatchHeightMethod.bodyHeight;
 		}
 		
-		memory.set('matchHeightMethod', method);
-		draw(memory.access());
+		state.matchHeightMethod = method;
+		draw(state);
 		save(MATCH_HEIGHT_METHOD_KEY, method.description);
 	};
 	
@@ -426,4 +426,4 @@ main.addEndpoint([elements.matchBodyHeight, elements.matchCapHeight, elements.ma
 window.addEventListener('load', () => {
 	document.documentElement.classList.remove('no-transitions');
 });
-main.init(draw, memory);
+main.init(draw, state);

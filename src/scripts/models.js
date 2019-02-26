@@ -1,42 +1,6 @@
-LT.Timeline = class Timeline {
-	constructor(initValue = undefined) {
-		this.time = new WeakMap();
-		this.arrow = { time: 0 };
-		
-		if (initValue !== undefined) {
-			this.commit(initValue);
-		}
-	}
-	
-	commit(state) {
-		this.arrow = { time: this.arrow.time + 1 };
-		this.time.set(this.arrow, state);
-		return this.arrow;
-	}
-	
-	has(arrow) {
-		return this.time.has(arrow);
-	}
-	
-	access(arrow = undefined) {
-		if (arrow === undefined) {
-			return this.time.get(this.arrow);
-		}
-		return this.time.get(arrow);
-	}
-	
-	set(key, value) {
-		return this.commit(this.access().set(key, value));
-	}
-	
-	get(key) {
-		return this.access().get(key);
-	}
-};
-
 LT.Interface = class Interface {
 	constructor() {
-		this.endpoints = new IMap();
+		this.endpoints = {};
 		this.queue = [];
 	}
 	
@@ -49,15 +13,15 @@ LT.Interface = class Interface {
 		
 		while (item = this.queue.shift()) {
 			const { properties, scope } = item;
-			this.endpoints.set(properties, scope(properties));
+			this.endpoints[properties] = scope(properties);
 		}
 	}
 	
-	init(draw, memory) {
-		memory.set('drawingEnabled', false);
+	init(draw, state) {
+		state.drawingEnabled = false;
 		this.processQueue();
-		memory.set('drawingEnabled', true);
-		draw(memory.access());
+		state.drawingEnabled = true;
+		draw(state);
 	}
 };
 
@@ -108,35 +72,35 @@ Note that font files may not be reachable before the document fully loaded. Ther
 
 ***/
 
-const fallbackFont = IMap({ name: LT.storage.fontStacks.standard });
-const notDefinedFont = IMap({ name: LT.storage.fontStacks.notDefined });
+const fallbackFont = { name: LT.storage.fontStacks.standard };
+const notDefinedFont = { name: LT.storage.fontStacks.notDefined };
 
 const idFont = (font) => {
-	LT.drawing.context.font = `32px ${font.get('name')}, ${LT.storage.fontStacks.standard}`;
+	LT.drawing.context.font = `32px ${font.name}, ${LT.storage.fontStacks.standard}`;
 	return [...'xghAW.*|&?', 'LVAW.Y+T'].reduce((id, x) =>
 		id + LT.drawing.context.measureText(x).width, 0);
 };
 
 const fontExists = (font) => {
-	const testFont = IMap({ name: `${font.get('name')}, ${LT.storage.fontStacks.notDefined}` });
+	const testFont = { name: `${font.name}, ${LT.storage.fontStacks.notDefined}` };
 	return idFont(testFont) !== idFont(notDefinedFont);
 };
 
 const applyFontToElement = (font, element, fontStack) => {
-	element.style.fontFamily = `${font.get('name')}, ${fontStack}`;
-	element.style.fontSize = `${font.get('scaleFactor')}em`;
+	element.style.fontFamily = `${font.name}, ${fontStack}`;
+	element.style.fontSize = `${font.scaleFactor}em`;
 	
-	if (font.has('config')) {
-		const config = font.get('config');
+	if (font.config !== undefined) {
+		const config = font.config;
 		
-		if (config.has('weight')) {
-			element.style.fontWeight = config.get('weight');
+		if (config.weight !== undefined) {
+			element.style.fontWeight = config.weight;
 		}
-		if (config.has('style')) {
-			element.style.fontStyle = config.get('style');
+		if (config.style !== undefined) {
+			element.style.fontStyle = config.style;
 		}
-		if (config.has('features')) {
-			element.style.fontFeatureSettings = config.get('features')
+		if (config.features !== undefined) {
+			element.style.fontFeatureSettings = config.features
 				.map((enabled, tag) => `'${tag}' ${enabled ? 'on' : 'off'}`)
 				.join(', ');
 		}
@@ -218,21 +182,6 @@ LT.Column = class Column {
 LT.Symbols = class Symbols {
 	constructor(symbols) {
 		this.symbols = symbols;
-	}
-	
-	static parse(string, parser) {
-		const symbols = [];
-		
-		for (let i = 0; i < string.length; i++) {
-			const slice = string.substring(i, string.length);
-			const symbolDistance = parser(slice);
-			const symbol = string.substr(i, symbolDistance);
-			
-			symbols.push(symbol);
-			i += symbolDistance - 1;
-		}
-		
-		return new LT.Symbols(symbols);
 	}
 	
 	get length() {
@@ -329,10 +278,3 @@ LT.Symbols = class Symbols {
 		return this.symbols.join('');
 	}
 };
-
-LT.State = Immutable.Record({
-	drawEnabled: false,
-	cells: IList(),
-	fonts: IList(),
-	matchHeightMethod: LT.MatchHeightMethod.bodyHeight,
-});

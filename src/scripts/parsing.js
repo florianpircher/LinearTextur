@@ -77,7 +77,7 @@ const constructTextCells = symbols =>
 
 const parseFontConfiguration = (string, defaultConfig) => {
 	const parts = string.split(/[\s,]+/).filter(x => x !== '');
-	let config = defaultConfig;
+	const config = JSON.parse(JSON.stringify(defaultConfig));
 	
 	for (const part of parts) {
 		let completeWeight;
@@ -85,21 +85,22 @@ const parseFontConfiguration = (string, defaultConfig) => {
 		
 		if ((completeWeight = complete(part, ['bold'])) !== null) {
 			// weight keyword
-			config = config.set('weight', completeWeight);
+			config.weight = completeWeight;
 		}
 		else if (/^\d{3}$/.test(part)) {
 			// weight number
-			config = config.set('weight', part);
+			config.weight = part;
 		}
 		else if ((completeStyle = complete(part, ['italic', 'oblique'])) !== null) {
 			// style keyword
-			config = config.set('style', completeStyle);
+			config.style = completeStyle;
 		}
 		else if (/^[+-]\S{4}$/.test(part)) {
 			// OpenType feature tag
 			const tag = part.slice(1, 5);
 			const enabled = part[0] === '+';
-			config = config.update('features', IMap(), x => x.set(tag, enabled));
+			if (config.features === undefined) config.features = {};
+			config.features[tag] = enabled;
 		}
 	}
 	
@@ -111,17 +112,10 @@ const parseFontsString = (string) => string.split(/[\n;]/)
 	.map(x => x.match(/^([^:(]*)(?:\(([^):]*)\)\s*)?(?:(?:\(.*)?:(.*))?/))
 	.filter(x => x !== null)
 	.reduce(([matches, defaultConfig], [, rawName, rawLabel, rawConfig]) => {
-		const name = rawName.trim();
-		const label = rawLabel !== undefined
-			? rawLabel.trim()
-			: null;
-		const config = rawConfig !== undefined
-			? parseFontConfiguration(rawConfig.trim(), defaultConfig)
-			: defaultConfig;
+		const font = { name: rawName.trim() };
+		if (font.name === '') return [matches, defaultConfig];
+		if (rawLabel !== undefined) font.label = rawLabel.trim();
+		if (rawConfig !== undefined) parseFontConfiguration(rawConfig.trim(), defaultConfig);
 		
-		if (name === '') {
-			return [matches, config];
-		}
-		const font = IMap({ name, label, config });
-		return [matches.push(font), defaultConfig];
-	}, [IList(), IMap()])[0];
+		return [matches.concat(font), defaultConfig];
+	}, [[], {}])[0];

@@ -17,5 +17,3 @@ const LinearTextur = (() => {
 	};
 })();
 const LT = LinearTextur;
-const IList = Immutable.List;
-const IMap = Immutable.Map;
