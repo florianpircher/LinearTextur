@@ -99,7 +99,7 @@ const parseFontConfiguration = (string, defaultConfig) => {
 			// OpenType feature tag
 			const tag = part.slice(1, 5);
 			const enabled = part[0] === '+';
-			config = config.update('features', Map(), x => x.set(tag, enabled));
+			config = config.update('features', IMap(), x => x.set(tag, enabled));
 		}
 	}
 	
@@ -122,6 +122,6 @@ const parseFontsString = (string) => string.split(/[\n;]/)
 		if (name === '') {
 			return [matches, config];
 		}
-		const font = Map({ name, label, config });
+		const font = IMap({ name, label, config });
 		return [matches.push(font), defaultConfig];
-	}, [List(), Map()])[0];
+	}, [IList(), IMap()])[0];

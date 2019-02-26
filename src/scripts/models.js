@@ -36,7 +36,7 @@ LT.Timeline = class Timeline {
 
 LT.Interface = class Interface {
 	constructor() {
-		this.endpoints = new Map();
+		this.endpoints = new IMap();
 		this.queue = [];
 	}
 	
@@ -91,8 +91,8 @@ LT.Text = class Text {
 // - config: FontConfiguration
 // - scaleFactor: number, scale factor for when drawing the font, > 0
 
-const fallbackFont = Map({ name: LT.storage.fontStacks.standard });
-const notDefinedFont = Map({ name: LT.storage.fontStacks.notDefined });
+const fallbackFont = IMap({ name: LT.storage.fontStacks.standard });
+const notDefinedFont = IMap({ name: LT.storage.fontStacks.notDefined });
 
 const idFont = (font) => {
 	LT.drawing.context.font = `32px ${font.get('name')}, ${LT.storage.fontStacks.standard}`;
@@ -101,7 +101,7 @@ const idFont = (font) => {
 };
 
 const fontExists = (font) => {
-	const testFont = Map({ name: `${font.get('name')}, ${LT.storage.fontStacks.notDefined}` });
+	const testFont = IMap({ name: `${font.get('name')}, ${LT.storage.fontStacks.notDefined}` });
 	return idFont(testFont) !== idFont(notDefinedFont);
 };
 
@@ -315,7 +315,7 @@ LT.Symbols = class Symbols {
 
 LT.State = Immutable.Record({
 	drawEnabled: false,
-	cells: List(),
-	fonts: List(),
+	cells: IList(),
+	fonts: IList(),
 	matchHeightMethod: LT.MatchHeightMethod.bodyHeight,
 });
