@@ -125,7 +125,7 @@ const scanGlyphsHeight = (glyphs, defaultHeight) => (font) => {
 	})();
 	
 	// Return precentage
-	return 1 - positionFirstNonWhitePixel / area;
+	return 1 - (positionFirstNonWhitePixel / area);
 };
 
 const manualMatchFontsGlyphsHeight = (fonts, glyphs, defaultHeight) => {
