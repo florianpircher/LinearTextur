@@ -103,8 +103,8 @@ const applyFontToElement = (font, element, fontStack, normalize = true) => {
 			element.style.fontStyle = config.style;
 		}
 		if (config.features !== undefined) {
-			element.style.fontFeatureSettings = config.features
-				.map((enabled, tag) => `'${tag}' ${enabled ? 'on' : 'off'}`)
+			element.style.fontFeatureSettings = Array.from(config.features.entries())
+				.map(([tag, enabled]) => `'${tag}' ${enabled ? 'on' : 'off'}`)
 				.join(', ');
 		}
 	}

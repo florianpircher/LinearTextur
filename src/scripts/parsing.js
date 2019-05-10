@@ -99,8 +99,8 @@ const parseFontConfiguration = (string, defaultConfig) => {
 			// OpenType feature tag
 			const tag = part.slice(1, 5);
 			const enabled = part[0] === '+';
-			if (config.features === undefined) config.features = {};
-			config.features[tag] = enabled;
+			if (config.features === undefined) config.features = new Map();
+			config.features.set(tag, enabled);
 		}
 	}
 	
@@ -113,9 +113,16 @@ const parseFontsString = (string) => string.split(/[\n;]/)
 	.filter(x => x !== null)
 	.reduce(([matches, defaultConfig], [, rawName, rawLabel, rawConfig]) => {
 		const font = { name: rawName.trim() };
-		if (font.name === '') return [matches, defaultConfig];
-		if (rawLabel !== undefined) font.label = rawLabel.trim();
-		if (rawConfig !== undefined) parseFontConfiguration(rawConfig.trim(), defaultConfig);
+		
+		if (font.name === '') {
+			return [matches, defaultConfig];
+		}
+		if (rawLabel !== undefined) {
+			font.label = rawLabel.trim();
+		}
+		if (rawConfig !== undefined) {
+			font.config = parseFontConfiguration(rawConfig.trim(), defaultConfig);
+		}
 		
 		return [matches.concat(font), defaultConfig];
 	}, [[], {}])[0];
