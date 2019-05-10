@@ -5,23 +5,23 @@ scripts_out="assets/scripts"
 scripts_cat="app.js"
 
 closure-compiler \
-	-W VERBOSE \
-	-O ADVANCED \
-	--env BROWSER \
-	--strict_mode_input \
-	--module_resolution BROWSER \
-	--language_out ECMASCRIPT_2015 \
-	--create_source_map "%outname%.map" \
-	--source_map_location_mapping "$root/$scripts_src|../../$scripts_src" \
-	--assume_function_wrapper \
-	--output_wrapper "(()=>{%output%})();
+  -W VERBOSE \
+  -O ADVANCED \
+  --env BROWSER \
+  --strict_mode_input \
+  --module_resolution BROWSER \
+  --language_out ECMASCRIPT_2015 \
+  --create_source_map "%outname%.map" \
+  --source_map_location_mapping "$root/$scripts_src|../../$scripts_src" \
+  --assume_function_wrapper \
+  --output_wrapper "(()=>{%output%})();
 //# sourceMappingURL=$scripts_cat.map" \
-	--js \
-		"$root/$scripts_src/init.js" \
-		"$root/$scripts_src/algorithms.js" \
-		"$root/$scripts_src/models.js" \
-		"$root/$scripts_src/parsing.js" \
-		"$root/$scripts_src/logic.js" \
-	--js_output_file "$root/$scripts_out/$scripts_cat" \
+  --js \
+    "$root/$scripts_src/init.js" \
+    "$root/$scripts_src/algorithms.js" \
+    "$root/$scripts_src/models.js" \
+    "$root/$scripts_src/parsing.js" \
+    "$root/$scripts_src/logic.js" \
+  --js_output_file "$root/$scripts_out/$scripts_cat" \
 
 "$root/system/integrity.ruby"

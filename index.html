@@ -1,137 +1,137 @@
 <!doctype html>
 <html lang="en" class="no-transitions">
-	<meta charset="utf-8">
-	<title>Linear Textur</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="./assets/styles/root.css">
-	<link rel="stylesheet" href="./assets/styles/app.css">
-	
-	<header class="header">
-		<h1 id="title">Linear Textur</h1>
-		
-		<form id="input-form">
-			<label class="label hidden" for="input-field">
-				Display Text
-			</label>
-			<input class="field" id="input-field"
-				value="name&lt;@&gt;example.org * flower * Endian&lt;&gt;"
-				autocomplete="off"
-				autocorrect="off"
-				autocapitalize="off"
-				spellcheck="false">
-			<div class="field-hint">
-				<a class="field-hint-link" href="#input-info">
-					input formatting tips
-				</a>
-			</div>
-		</form>
-		
-		<div id="controls">
-			<div class="control">
-				<label class="label type-slider" for="font-size-slider">
-					Font Size
-				</label>
-				<input class="slider" id="font-size-slider" type="range"
-					title="doubleclick to reset"
-					value="3"
-					data-default="3"
-					min="0.2"
-					max="12"
-					step="0.1">
-			</div>
-			<div class="control">
-				<label class="label type-slider" for="column-spacing-slider">
-					Column Spacing
-				</label>
-				<input class="slider" id="column-spacing-slider" type="range"
-					title="doubleclick to reset"
-					value="1.5"
-					data-default="1.5"
-					min="0"
-					max="3"
-					step="0.025">
-			</div>
-			<div class="control">
-				<label class="label type-slider" for="row-spacing-slider">
-					Row Spacing
-				</label>
-				<input class="slider" id="row-spacing-slider" type="range"
-					title="doubleclick to reset"
-					value="0.5"
-					data-default="0.5"
-					min="0"
-					max="2"
-					step="0.025">
-			</div>
-		</div>
-		
-		<div id="settings">
-			<label class="label hidden" for="fonts-field">
-				Font Settings
-			</label>
-			<textarea class="field" id="font-settings-field"
-				rows="5"
-				autocomplete="off"
-				autocorrect="off"
-				autocapitalize="off"
-				spellcheck="false"></textarea>
-			<div class="field-hint">
-				<a class="field-hint-link" href="#fonts-info">
-					font settings tips
-				</a>
-			</div>
-		</div>
-		
-		<div id="options">
-			<div hidden>
-				<div class="preference option">
-					<input class="checkbox" id="autosize-font-settings-option" type="checkbox">
-					<label class="checkbox-box" for="autosize-font-settings-option"></label>
-					<label class="checkbox-label" for="autosize-font-settings-option">Autosize settings</label>
-				</div>
-				<div class="preference option">
-					<input class="checkbox" id="show-font-labels-option" type="checkbox">
-					<label class="checkbox-box" for="show-font-labels-option"></label>
-					<label class="checkbox-label" for="show-font-labels-option">Show labels</label>
-				</div>
-			</div>
-			<div class="preference radios">
-				<div class="radios-label">Match:</div>
-				<div class="radios-options">
-					<div class="option">
-						<input class="radio" id="match-body-height-option" type="radio" name="match-height-option">
-						<label class="radio-box" for="match-body-height-option"></label>
-						<label class="radio-label" for="match-body-height-option">nothing</label>
-					</div>
-					<div class="option">
-						<input class="radio" id="match-cap-height-option" type="radio" name="match-height-option">
-						<label class="radio-box" for="match-cap-height-option"></label>
-						<label class="radio-label" for="match-cap-height-option">uppercase</label>
-					</div>
-					<div class="option">
-						<input class="radio" id="match-x-height-option" type="radio" name="match-height-option">
-						<label class="radio-box" for="match-x-height-option"></label>
-						<label class="radio-label" for="match-x-height-option">lowercase</label>
-					</div>
-				</div>
-			</div>
-	</header>
-	
-	<aside class="information" hidden>
-		<h2>Information</h2>
-		
-		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-	</aside>
-	
-	<main class="content">
-		<table id="matrix"></table>
-	</main>
-	
-	<div id="metrics"></div>
-	
-	<script src="./src/scripts/init.js"></script>
-	<script src="./src/scripts/algorithms.js"></script>
-	<script src="./src/scripts/models.js"></script>
-	<script src="./src/scripts/parsing.js"></script>
-	<script src="./src/scripts/logic.js"></script>
+  <meta charset="utf-8">
+  <title>Linear Textur</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./assets/styles/root.css">
+  <link rel="stylesheet" href="./assets/styles/app.css">
+  
+  <header class="header">
+    <h1 id="title">Linear Textur</h1>
+    
+    <form id="input-form">
+      <label class="label hidden" for="input-field">
+        Display Text
+      </label>
+      <input class="field" id="input-field"
+        value="name&lt;@&gt;example.org * flower * Endian&lt;&gt;"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false">
+      <div class="field-hint">
+        <a class="field-hint-link" href="#input-info">
+          input formatting tips
+        </a>
+      </div>
+    </form>
+    
+    <div id="controls">
+      <div class="control">
+        <label class="label type-slider" for="font-size-slider">
+          Font Size
+        </label>
+        <input class="slider" id="font-size-slider" type="range"
+          title="doubleclick to reset"
+          value="3"
+          data-default="3"
+          min="0.2"
+          max="12"
+          step="0.1">
+      </div>
+      <div class="control">
+        <label class="label type-slider" for="column-spacing-slider">
+          Column Spacing
+        </label>
+        <input class="slider" id="column-spacing-slider" type="range"
+          title="doubleclick to reset"
+          value="1.5"
+          data-default="1.5"
+          min="0"
+          max="3"
+          step="0.025">
+      </div>
+      <div class="control">
+        <label class="label type-slider" for="row-spacing-slider">
+          Row Spacing
+        </label>
+        <input class="slider" id="row-spacing-slider" type="range"
+          title="doubleclick to reset"
+          value="0.5"
+          data-default="0.5"
+          min="0"
+          max="2"
+          step="0.025">
+      </div>
+    </div>
+    
+    <div id="settings">
+      <label class="label hidden" for="fonts-field">
+        Font Settings
+      </label>
+      <textarea class="field" id="font-settings-field"
+        rows="5"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"></textarea>
+      <div class="field-hint">
+        <a class="field-hint-link" href="#fonts-info">
+          font settings tips
+        </a>
+      </div>
+    </div>
+    
+    <div id="options">
+      <div hidden>
+        <div class="preference option">
+          <input class="checkbox" id="autosize-font-settings-option" type="checkbox">
+          <label class="checkbox-box" for="autosize-font-settings-option"></label>
+          <label class="checkbox-label" for="autosize-font-settings-option">Autosize settings</label>
+        </div>
+        <div class="preference option">
+          <input class="checkbox" id="show-font-labels-option" type="checkbox">
+          <label class="checkbox-box" for="show-font-labels-option"></label>
+          <label class="checkbox-label" for="show-font-labels-option">Show labels</label>
+        </div>
+      </div>
+      <div class="preference radios">
+        <div class="radios-label">Match:</div>
+        <div class="radios-options">
+          <div class="option">
+            <input class="radio" id="match-body-height-option" type="radio" name="match-height-option">
+            <label class="radio-box" for="match-body-height-option"></label>
+            <label class="radio-label" for="match-body-height-option">nothing</label>
+          </div>
+          <div class="option">
+            <input class="radio" id="match-cap-height-option" type="radio" name="match-height-option">
+            <label class="radio-box" for="match-cap-height-option"></label>
+            <label class="radio-label" for="match-cap-height-option">uppercase</label>
+          </div>
+          <div class="option">
+            <input class="radio" id="match-x-height-option" type="radio" name="match-height-option">
+            <label class="radio-box" for="match-x-height-option"></label>
+            <label class="radio-label" for="match-x-height-option">lowercase</label>
+          </div>
+        </div>
+      </div>
+  </header>
+  
+  <aside class="information" hidden>
+    <h2>Information</h2>
+    
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  </aside>
+  
+  <main class="content">
+    <table id="matrix"></table>
+  </main>
+  
+  <div id="metrics"></div>
+  
+  <script src="./src/scripts/init.js"></script>
+  <script src="./src/scripts/algorithms.js"></script>
+  <script src="./src/scripts/models.js"></script>
+  <script src="./src/scripts/parsing.js"></script>
+  <script src="./src/scripts/logic.js"></script>
 </html>
