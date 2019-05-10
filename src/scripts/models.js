@@ -86,9 +86,12 @@ const fontExists = (font) => {
 	return idFont(testFont) !== idFont(notDefinedFont);
 };
 
-const applyFontToElement = (font, element, fontStack) => {
+const applyFontToElement = (font, element, fontStack, normalize = true) => {
 	element.style.fontFamily = `${font.name}, ${fontStack}`;
-	element.style.fontSize = `${font.scaleFactor}em`;
+	
+	if (normalize) {
+		element.style.fontSize = `${font.scaleFactor}em`;
+	}
 	
 	if (font.config !== undefined) {
 		const config = font.config;

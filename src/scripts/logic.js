@@ -67,7 +67,7 @@ const observeNodeTree = {
 
 const renderTestNode = (height) => (font) => {
 	const testNode = document.createElement('div');
-	applyFontToElement(font, testNode, LT.storage.fontStacks.standard);
+	applyFontToElement(font, testNode, LT.storage.fontStacks.standard, false);
 	testNode.style.height = height;
 	
 	return testNode;
