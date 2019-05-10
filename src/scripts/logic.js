@@ -137,7 +137,7 @@ const manualMatchFontsGlyphsHeight = (fonts, glyphs, defaultHeight) => {
 	const heights = fonts.map(scanGlyphsHeight(glyphs, defaultHeight));
 	const medianHeight = median(heights);
 	return heights.map(x => medianHeight / x);
-}
+};
 
 const manuelMatchFontsCapHeight = fonts =>
 	manualMatchFontsGlyphsHeight(fonts, ['H', 'X', 'V'], 0.7);
@@ -156,7 +156,7 @@ const scalarsForMatchingFonts = (fonts, matchMethod) => {
 		console.error('Illegal match method.', matchMethod);
 		throw new Error('Illegal match method.');
 	}
-}
+};
 
 const matchFonts = async (fonts, matchMethod) => {
 	const scalars = await scalarsForMatchingFonts(fonts, matchMethod);

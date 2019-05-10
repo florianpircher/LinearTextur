@@ -105,7 +105,7 @@ const applyFontToElement = (font, element, fontStack) => {
 				.join(', ');
 		}
 	}
-}
+};
 
 LT.MatchHeightMethod = {
 	bodyHeight: Symbol('body-height'),
