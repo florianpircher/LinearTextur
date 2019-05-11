@@ -28,7 +28,7 @@ const fontSettingsDefaults = [
     {name: 'serif'},
   ],
   [
-    {name: 'Palatino Linotype', config: 'italic'},
+    {name: 'Palatino Linotype', config: 'italic +onum'},
     {name: 'Palatino', config: 'italic'},
     {name: 'Palladio', config: 'italic'},
     {name: 'URW Palladio L', config: 'italic'},
