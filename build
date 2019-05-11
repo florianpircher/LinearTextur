@@ -23,5 +23,3 @@ closure-compiler \
     "$root/$scripts_src/parsing.js" \
     "$root/$scripts_src/logic.js" \
   --js_output_file "$root/$scripts_out/$scripts_cat" \
-
-"$root/system/integrity.ruby"
