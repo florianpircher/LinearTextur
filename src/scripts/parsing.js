@@ -75,9 +75,19 @@ const constructTextCells = symbols =>
 // Font Settings
 //
 
+const cloneConfig = (sourceConfig) => {
+  const config = Object.assign({}, sourceConfig);
+  
+  if (config.features !== undefined) {
+    config.features = new Map(config.features);
+  }
+  
+  return config;
+};
+
 const parseFontConfiguration = (string, defaultConfig) => {
   const parts = string.split(/[\s,]+/).filter(x => x !== '');
-  const config = JSON.parse(JSON.stringify(defaultConfig));
+  const config = cloneConfig(defaultConfig);
   
   for (const part of parts) {
     let completeWeight;
@@ -112,11 +122,11 @@ const parseFontsString = (string) => string.split(/[\n;]/)
   .map(x => x.match(/^([^:(]*)(?:\(([^):]*)\)\s*)?(?:(?:\(.*)?:(.*))?/))
   .filter(x => x !== null)
   .reduce(([matches, defaultConfig], [, rawName, rawLabel, rawConfig]) => {
-    const font = { name: rawName.trim() };
+    const font = {
+      name: rawName.trim(),
+      config: defaultConfig,
+    };
     
-    if (font.name === '') {
-      return [matches, defaultConfig];
-    }
     if (rawLabel !== undefined) {
       font.label = rawLabel.trim();
     }
@@ -124,5 +134,8 @@ const parseFontsString = (string) => string.split(/[\n;]/)
       font.config = parseFontConfiguration(rawConfig.trim(), defaultConfig);
     }
     
+    if (font.name === '') {
+      return [matches, font.config];
+    }
     return [matches.concat(font), defaultConfig];
   }, [[], {}])[0];
