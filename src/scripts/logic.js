@@ -1,10 +1,11 @@
 // Storage Keys
-const STRING_KEY = 'lineartextur.app.data.string';
-const FONTS_KEY = 'lineartextur.app.data.fonts';
-const FONT_SIZE_KEY = 'lineartextur.app.preferences.font-size';
-const COLUMN_SPACING_KEY = 'lineartextur.app.preferences.column-spacing';
-const ROW_SPACING_KEY = 'lineartextur.app.preferences.row-spacing';
-const MATCH_HEIGHT_METHOD_KEY = 'lineartextur.app.preferences.match-height';
+const STORAGE_PREFIX = 'com.linear-textur.app';
+const STRING_KEY = STORAGE_PREFIX + '.data.string';
+const FONTS_KEY = STORAGE_PREFIX + '.data.fonts';
+const FONT_SIZE_KEY = STORAGE_PREFIX + '.preferences.font-size';
+const COLUMN_SPACING_KEY = STORAGE_PREFIX + '.preferences.column-spacing';
+const ROW_SPACING_KEY = STORAGE_PREFIX + '.preferences.row-spacing';
+const MATCH_HEIGHT_METHOD_KEY = STORAGE_PREFIX + '.preferences.match-height';
 
 // Defaults
 const fontSettingsDefaults = [
