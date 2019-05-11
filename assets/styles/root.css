@@ -29,7 +29,7 @@
   --cc-F: #111;
   /* color palette */
   --cc-01: var(--cc-F);
-  --cc-02: #ecebe9;
+  --cc-02: #eeece8;
   --cc-03: #c00;
   /* named */
   --cc-field-fg: var(--cc-F);
