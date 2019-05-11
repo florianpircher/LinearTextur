@@ -6,6 +6,38 @@ const COLUMN_SPACING_KEY = 'lineartextur.app.preferences.column-spacing';
 const ROW_SPACING_KEY = 'lineartextur.app.preferences.row-spacing';
 const MATCH_HEIGHT_METHOD_KEY = 'lineartextur.app.preferences.match-height';
 
+// Defaults
+const fontSettingsDefaults = [
+  [
+    {name: 'Avenir Next', config: '+onum'},
+    {name: 'Corbel'},
+    {name: 'Lucida Grande'},
+    {name: 'Lucida Sans Unicode'},
+    {name: 'Lucida Sans'},
+    {name: 'DejaVu Sans'},
+    {name: 'Bitstream Vera Sans'},
+    {name: 'Liberation Sans'},
+    {name: 'sans-serif'},
+  ],
+  [
+    {name: 'Iowan Old Style', config: '+smcp'},
+    {name: 'Constantia', config: '+smcp +onum'},
+    {name: 'Linux Libertine', config: '+smcp +onum'},
+    {name: 'Utopia', config: '+smcp +onum'},
+    {name: 'DejaVu Serif', config: '+smcp +onum'},
+    {name: 'serif'},
+  ],
+  [
+    {name: 'Palatino Linotype', config: 'italic'},
+    {name: 'Palatino', config: 'italic'},
+    {name: 'Palladio', config: 'italic'},
+    {name: 'URW Palladio L', config: 'italic'},
+    {name: 'Book Antiqua', config: 'italic'},
+    {name: 'Linux Libertine', config: 'italic'},
+    {name: 'cursive', config: 'italic'},
+  ],
+];
+
 // Storage
 const storage = window.localStorage;
 const save = (key, value) => storage.setItem(key, JSON.stringify(value));
@@ -258,6 +290,24 @@ const draw = async (state) => {
     }
   }
 };
+
+// Load Initial Fonts
+main.addEndpoint(fontSettingsDefaults, (defaults) => {
+  if (load(FONTS_KEY) !== null) return;
+  
+  const settings = defaults.map((stack) => {
+    const font = stack.find((font) => {
+      return fontExists({ name: font.name });
+    });
+    
+    let line = font.name;
+    if (font.config !== undefined) line += ` : ${font.config}`;
+    
+    return line;
+  }).join('\n');
+  
+  elements.fontSettings.value = settings;
+});
 
 // Display Text Field
 
