@@ -96,14 +96,15 @@ const applyFontToElement = (font, element, fontStack, normalize = true) => {
   if (font.config !== undefined) {
     const config = font.config;
     
+    // use string accessors to allow for advanced optimization mode
     if (config.weight !== undefined) {
-      element.style.fontWeight = config.weight;
+      element.style['fontWeight'] = config.weight;
     }
     if (config.style !== undefined) {
-      element.style.fontStyle = config.style;
+      element.style['fontStyle'] = config.style;
     }
     if (config.features !== undefined) {
-      element.style.fontFeatureSettings = Array.from(config.features.entries())
+      element.style['fontFeatureSettings'] = Array.from(config.features.entries())
         .map(([tag, enabled]) => `'${tag}' ${enabled ? 'on' : 'off'}`)
         .join(', ');
     }
