@@ -77,7 +77,7 @@ const notDefinedFont = { name: LT.storage.fontStacks.notDefined };
 
 const idFont = (font) => {
   LT.drawing.context.font = `32px ${font.name}, ${LT.storage.fontStacks.standard}`;
-  return [...'xghAW.*|&?', 'LVAW.Y+T'].reduce((id, x) =>
+  return [...'xgh@AW.*|&?', 'LVAW.Y+Ta'].reduce((id, x) =>
     id + LT.drawing.context.measureText(x).width, 0);
 };
 
