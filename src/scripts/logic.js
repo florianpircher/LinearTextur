@@ -10,7 +10,7 @@ const MATCH_HEIGHT_METHOD_KEY = STORAGE_PREFIX + '.preferences.match-height';
 // Defaults
 const fontSettingsDefaults = [
   [
-    {name: 'Avenir Next', config: '+onum'},
+    {name: 'Avenir Next', configString: '+onum'},
     {name: 'Corbel'},
     {name: 'Lucida Grande'},
     {name: 'Lucida Sans Unicode'},
@@ -21,21 +21,21 @@ const fontSettingsDefaults = [
     {name: 'sans-serif'},
   ],
   [
-    {name: 'Iowan Old Style', config: '+smcp'},
-    {name: 'Constantia', config: '+smcp +onum'},
-    {name: 'Linux Libertine', config: '+smcp +onum'},
-    {name: 'Utopia', config: '+smcp +onum'},
-    {name: 'DejaVu Serif', config: '+smcp +onum'},
+    {name: 'Iowan Old Style', configString: '+smcp'},
+    {name: 'Constantia', configString: '+smcp +onum'},
+    {name: 'Linux Libertine', configString: '+smcp +onum'},
+    {name: 'Utopia', configString: '+smcp +onum'},
+    {name: 'DejaVu Serif', configString: '+smcp +onum'},
     {name: 'serif'},
   ],
   [
-    {name: 'Palatino Linotype', config: 'italic +onum'},
-    {name: 'Palatino', config: 'italic'},
-    {name: 'Palladio', config: 'italic'},
-    {name: 'URW Palladio L', config: 'italic'},
-    {name: 'Book Antiqua', config: 'italic'},
-    {name: 'Linux Libertine', config: 'italic'},
-    {name: 'cursive', config: 'italic'},
+    {name: 'Palatino Linotype', configString: 'italic +onum'},
+    {name: 'Palatino', configString: 'italic'},
+    {name: 'Palladio', configString: 'italic'},
+    {name: 'URW Palladio L', configString: 'italic'},
+    {name: 'Book Antiqua', configString: 'italic'},
+    {name: 'Linux Libertine', configString: 'italic'},
+    {name: 'cursive', configString: 'italic'},
   ],
 ];
 
@@ -302,7 +302,7 @@ main.addEndpoint(fontSettingsDefaults, (defaults) => {
     });
     
     let line = font.name;
-    if (font.config !== undefined) line += ` : ${font.config}`;
+    if (font.configString !== undefined) line += ` : ${font.configString}`;
     
     return line;
   }).join('\n');
