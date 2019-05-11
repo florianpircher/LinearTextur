@@ -111,10 +111,13 @@ const applyFontToElement = (font, element, fontStack, normalize = true) => {
   }
 };
 
+// Microsoft Edge does not support the description field on symbols.
+const DescriptionSymbol = (description) => ({ description });
+
 LT.MatchHeightMethod = {
-  bodyHeight: Symbol('body-height'),
-  capHeight: Symbol('cap-height'),
-  xHeight: Symbol('x-height'),
+  bodyHeight: DescriptionSymbol('body-height'),
+  capHeight: DescriptionSymbol('cap-height'),
+  xHeight: DescriptionSymbol('x-height'),
 };
 
 LT.Rendering = class Rendering {
