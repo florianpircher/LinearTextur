@@ -321,6 +321,9 @@
   padding-top: var(--setting-row-spacing);
 }
 
+.cell-text-view {
+  font-family: 'Adobe NotDef';
+}
 .cell-text-view.fallback-font {
   color: var(--cc-row-label-fg);
 }
