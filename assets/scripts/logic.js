@@ -301,16 +301,20 @@ const draw = async (state) => {
 main.addEndpoint(fontSettingsDefaults, (defaults) => {
   if (load(FONTS_KEY) !== null) return;
   
-  const settings = defaults.map((stack) => {
-    const font = stack.find((font) => {
-      return fontExists({ name: font.name });
-    });
-    
-    let line = font.name;
-    if (font.configString !== undefined) line += ` : ${font.configString}`;
-    
-    return line;
-  }).join('\n');
+  const settings = defaults
+    .map((stack) => {
+      const font = stack.find((font) => {
+        return fontExists({ name: font.name });
+      });
+      if (font === undefined) return null;
+      
+      let line = font.name;
+      if (font.configString !== undefined) line += ` : ${font.configString}`;
+      
+      return line;
+    })
+    .filter(x => x !== null)
+    .join('\n');
   
   elements.fontSettings.value = settings;
 });
