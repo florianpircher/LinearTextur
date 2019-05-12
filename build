@@ -5,9 +5,31 @@ if [[ "$#" -ne 1 ]]; then
 fi
 
 root="$1"
-scripts_src="src/scripts"
-scripts_out="assets/scripts"
-scripts_cat="app.js"
+system="$root/system"
+transit="$system/transit"
+dest="$root/www"
+
+mkdir -p "$transit"
+mkdir -p "$dest"
+
+cd "$root"
+echo "--- coping static files ..."
+
+rm -rf "$dest/assets"
+mkdir -p "$dest/assets"
+
+cp "$root/favicon.ico" "$dest/favicon.ico"
+
+rsync -r --exclude=".DS_Store" \
+  "$root/assets/fonts" \
+  "$root/assets/images" \
+  "$dest/assets/"
+
+echo "--- closure-compiler ..."
+
+mkdir -p "$dest/assets/scripts/"
+
+scripts_root="$root/assets/scripts"
 
 closure-compiler \
   -W VERBOSE \
@@ -16,15 +38,43 @@ closure-compiler \
   --strict_mode_input \
   --module_resolution BROWSER \
   --language_out ECMASCRIPT_2015 \
-  --create_source_map "%outname%.map" \
-  --source_map_location_mapping "$root/$scripts_src|../../$scripts_src" \
-  --assume_function_wrapper \
-  --output_wrapper "(()=>{%output%})();
-//# sourceMappingURL=$scripts_cat.map" \
   --js \
-    "$root/$scripts_src/init.js" \
-    "$root/$scripts_src/algorithms.js" \
-    "$root/$scripts_src/models.js" \
-    "$root/$scripts_src/parsing.js" \
-    "$root/$scripts_src/logic.js" \
-  --js_output_file "$root/$scripts_out/$scripts_cat" \
+    "$scripts_root/init.js" \
+    "$scripts_root/algorithms.js" \
+    "$scripts_root/models.js" \
+    "$scripts_root/parsing.js" \
+    "$scripts_root/logic.js" \
+  --js_output_file "$dest/assets/scripts/app.js" \
+
+echo "--- postcss ..."
+
+styles_root="$root/assets/styles"
+cat "$styles_root/root.css" "$styles_root/app.css" > "$transit/main.css"
+
+postcss "$transit/main.css" \
+  --config "$system" \
+  --map \
+  --output "$dest/assets/styles/main.css"
+
+echo "--- html-export ..."
+
+cat "$root/index.html" | "$system/html-export.rb" > "$transit/index.html"
+
+echo "--- html-minifier ..."
+
+html-minifier \
+  --collapse-boolean-attributes \
+  --collapse-whitespace \
+  --decode-entities \
+  --remove-attribute-quotes \
+  --remove-comments \
+  --remove-empty-attributes \
+  --remove-optional-tags \
+  --remove-redundant-attributes \
+  --remove-script-type-attributes \
+  --remove-style-link-type-attributes \
+  "$transit/index.html" > "$dest/index.html"
+
+rm -rf "$transit"
+
+echo "--- done."
