@@ -12,12 +12,12 @@ const fontSettingsDefaults = [
   [
     {name: 'Avenir Next', configString: '+onum'},
     {name: 'Corbel'},
-    {name: 'Lucida Grande'},
-    {name: 'Lucida Sans Unicode'},
-    {name: 'Lucida Sans'},
-    {name: 'DejaVu Sans'},
-    {name: 'Bitstream Vera Sans'},
-    {name: 'Liberation Sans'},
+    {name: 'Lucida Grande', configString: '+onum'},
+    {name: 'Lucida Sans Unicode', configString: '+onum'},
+    {name: 'Lucida Sans', configString: '+onum'},
+    {name: 'DejaVu Sans', configString: '+onum'},
+    {name: 'Bitstream Vera Sans', configString: '+onum'},
+    {name: 'Liberation Sans', configString: '+onum'},
     {name: 'sans-serif'},
   ],
   [
