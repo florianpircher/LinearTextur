@@ -18,6 +18,7 @@ const fontSettingsDefaults = [
     {name: 'DejaVu Sans', configString: '+onum'},
     {name: 'Bitstream Vera Sans', configString: '+onum'},
     {name: 'Liberation Sans', configString: '+onum'},
+    {name: 'Verdana'},
     {name: 'sans-serif'},
   ],
   [
@@ -26,6 +27,8 @@ const fontSettingsDefaults = [
     {name: 'Linux Libertine', configString: '+smcp +onum'},
     {name: 'Utopia', configString: '+smcp +onum'},
     {name: 'DejaVu Serif', configString: '+smcp +onum'},
+    {name: 'Georgia'},
+    {name: 'Times New Roman'},
     {name: 'serif'},
   ],
   [
@@ -35,6 +38,8 @@ const fontSettingsDefaults = [
     {name: 'URW Palladio L', configString: 'italic'},
     {name: 'Book Antiqua', configString: 'italic'},
     {name: 'Linux Libertine', configString: 'italic'},
+    {name: 'Georgia', configString: 'italic'},
+    {name: 'Times New Roman', configString: 'italic'},
     {name: 'cursive', configString: 'italic'},
   ],
 ];
