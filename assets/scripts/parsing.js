@@ -8,7 +8,7 @@ const nextSymbol = ([a, b], escapeChar, specialChars) =>
 const flattenSymbol = (symbol, escapeChar, specialChars) => {
   const [a, b] = symbol;
   if (a === escapeChar && specialChars.includes(b)) {
-    return a;
+    return b;
   }
   return symbol;
 }
