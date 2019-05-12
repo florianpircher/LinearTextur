@@ -3,8 +3,15 @@
   <meta charset="utf-8">
   <title>Linear Textur</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="./assets/styles/root.css">
-  <link rel="stylesheet" href="./assets/styles/app.css">
+  <link rel="icon" href="/assets/images/icon/16.png" sizes="16x16">
+  <link rel="icon" href="/assets/images/icon/32.png" sizes="32x32">
+  <link rel="mask-icon" href="/assets/images/icon/mask.svg" color="black">
+  <!-- #begin(local) -->
+  <link rel="stylesheet" href="/assets/styles/root.css">
+  <link rel="stylesheet" href="/assets/styles/app.css">
+  <!-- #end(local) -->
+  <!-- #export <link rel="stylesheet" href="/assets/styles/main.css"> -->
+  <link rel="preload" href="/assets/fonts/and-regular.woff2" as="font" type="font/woff2" crossorigin>
   
   <header class="header">
     <h1 id="title">Linear Textur</h1>
@@ -14,9 +21,8 @@
         Display Text
       </label>
       <input class="field" id="input-field"
-        value="name&lt;@&gt;example.org * 0123456&lt;7&gt;89"
+        value="name<@>example.org * 0123456<7>89"
         autocomplete="off"
-        autocorrect="off"
         autocapitalize="off"
         spellcheck="false">
       <div class="field-hint">
@@ -37,7 +43,7 @@
           data-default="3"
           min="0.2"
           max="12"
-          step="0.1">
+          step="0.025">
       </div>
       <div class="control">
         <label class="label type-slider" for="column-spacing-slider">
@@ -72,7 +78,6 @@
       <textarea class="field" id="font-settings-field"
         rows="5"
         autocomplete="off"
-        autocorrect="off"
         autocapitalize="off"
         spellcheck="false">Avenir Next : +onum
 Iowan Old Style : +smcp
@@ -85,34 +90,19 @@ Palatino Linotype : italic</textarea>
     </div>
     
     <div id="options">
-      <div hidden>
-        <div class="preference option">
-          <input class="checkbox" id="autosize-font-settings-option" type="checkbox">
-          <label class="checkbox-box" for="autosize-font-settings-option"></label>
-          <label class="checkbox-label" for="autosize-font-settings-option">Autosize settings</label>
-        </div>
-        <div class="preference option">
-          <input class="checkbox" id="show-font-labels-option" type="checkbox">
-          <label class="checkbox-box" for="show-font-labels-option"></label>
-          <label class="checkbox-label" for="show-font-labels-option">Show labels</label>
-        </div>
-      </div>
       <div class="preference radios">
         <div class="radios-label">Match:</div>
         <div class="radios-options">
           <div class="option">
             <input class="radio" id="match-body-height-option" type="radio" name="match-height-option">
-            <label class="radio-box" for="match-body-height-option"></label>
             <label class="radio-label" for="match-body-height-option">nothing</label>
           </div>
           <div class="option">
             <input class="radio" id="match-cap-height-option" type="radio" name="match-height-option">
-            <label class="radio-box" for="match-cap-height-option"></label>
             <label class="radio-label" for="match-cap-height-option">uppercase</label>
           </div>
           <div class="option">
             <input class="radio" id="match-x-height-option" type="radio" name="match-height-option">
-            <label class="radio-box" for="match-x-height-option"></label>
             <label class="radio-label" for="match-x-height-option">lowercase</label>
           </div>
         </div>
@@ -126,10 +116,12 @@ Palatino Linotype : italic</textarea>
   
   <div id="metrics"></div>
   
-  <script src="./src/scripts/init.js"></script>
-  <script src="./src/scripts/algorithms.js"></script>
-  <script src="./src/scripts/models.js"></script>
-  <script src="./src/scripts/parsing.js"></script>
-  <script src="./src/scripts/logic.js"></script>
-  <!-- <script src="./assets/scripts/app.js"></script> -->
+  <!-- #begin(local) -->
+  <script src="/assets/scripts/init.js"></script>
+  <script src="/assets/scripts/algorithms.js"></script>
+  <script src="/assets/scripts/models.js"></script>
+  <script src="/assets/scripts/parsing.js"></script>
+  <script src="/assets/scripts/logic.js"></script>
+  <!-- #end(local) -->
+  <!-- #export <script src="/assets/scripts/app.js"></script> -->
 </html>
