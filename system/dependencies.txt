@@ -1,0 +1,8 @@
+# PostCSS
+npm install -g postcss-cli
+
+# Closure Compiler
+brew install closure-compiler
+
+# HTML Minifier
+npm install -g html-minifier
