@@ -38,47 +38,107 @@ LT.Text = class Text {
   }
 };
 
-/***
-
-#(section [Fonts])
-
-A \(term {font}) is an instance of a typeface. Its form closely models the font description of CSS. The file to be used is selecte by the \(key `name`) and may be altered by specifying a weight- and/or style-varient using the \(key `config`). The font configuration also allows to select OpenType display variants.
-
-A label can be provided, which is used instead of the name for display purposes. An optional scale-factor may be specified to scale text rendered using the font. If no scale factor is provided a value of 1 (no scaling) is to be assumed.
-
-Note that font files may not be reachable before the document fully loaded. Therefore some operations, such as measuring font metrics, might not work during page load.
-
-#('font-weight def .string{:ex ("400" "bold")})
-#('font-style def .string{:ex ("italic" "oblique")})
-#('opentype-tag def .string{:length 4, :ex ("smcp" "dlig")})
-#('font-features def .map{:keys {*opentype-tag *boolean}})
-#('font-config def .map{:keys {
-  "weight" *font-weight
-  "style" *font-style
-  "features" *font-features}})
-
-#('font-name def .string{
-  :ex ("Futura" "ArnoPro-Display")
-  :desc "CSS font-name, typically the PostScript name of the font"})
-#('font-label def .string{:ex ("Futura" "Arno (Display)")})
-#('font-scale-factor def .number{ 
-  :ex (0.7, 1.0, 1.2)
-  :desc "scale factor for when drawing the font"})
-#('font def .map{:keys {
-  "name" *font-name
-  "label" *font-label
-  "config" *font-config
-  "scaleFactor" *font-scale-factor}})
-
-***/
+/*
+ * 
+ * A font is an instance of a typeface. Its form closely models the font
+ * description of CSS. The file to be used is selecte by the `name` and may be
+ * altered by specifying a weight- and/or style-varient using the `config`. The
+ * font configuration also allows to select OpenType display variants.
+ * 
+ * A label can be provided, which is used instead of the name for display
+ * purposes. An optional scale-factor may be specified to scale text rendered
+ * using the font. If no scale factor is provided a value of 1 (no scaling) is
+ * to be assumed.
+ * 
+ * Note that font files may not be reachable before the document fully loaded.
+ * Therefore some operations, such as measuring font metrics, might not work
+ * during page load.
+ * 
+ * :font-weight = string{:ex ("400" "bold")}
+ * :font-style = string{:ex ("italic" "oblique")}
+ * :opentype-tag = string{:length 4, :ex ("smcp" "dlig")}
+ * :font-features = map{:keys {:opentype-tag :boolean}}
+ * :font-config = map{:keys {
+ *   "weight" *font-weight
+ *   "style" *font-style
+ *   "features" *font-features}}
+ * 
+ * :font-name = string{
+ *   :desc "CSS font-name, typically the PostScript name of the font"
+ *   :ex ("Futura" "ArnoPro-Display")}
+ * :font-label = string{:ex ("Futura" "Arno (Display)")}
+ * :font-scale-factor = number{ 
+ *   :ex (0.7, 1.0, 1.2)
+ *   :desc "scale factor for when drawing the font"}
+ * :font = map{:keys {
+ *   "name" *font-name
+ *   "label" *font-label
+ *   "config" *font-config
+ *   "scaleFactor" *font-scale-factor}}
+ */
 
 const fallbackFont = { name: LT.storage.fontStacks.standard };
 const notDefinedFont = { name: LT.storage.fontStacks.notDefined };
 
+// Font Tools
+
+const containsCharacterCache = new Map();
+
+const containsCharacter = (font, char) => {
+  if (!containsCharacterCache.has(font.name)) {
+    containsCharacterCache.set(font.name, new Map());
+  }
+  const charMap = containsCharacterCache.get(font.name);
+  
+  if (charMap.has(char)) return charMap.get(char);
+  
+  const width = LT.drawing.canvas.width;
+  const height = LT.drawing.canvas.height;
+  const ctx = LT.drawing.context;
+  
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#000';
+  
+  ctx.font = `${height}px ${font.name}, ${LT.storage.fontStacks.notDefined}`;
+  ctx.fillText(char, 0, height);
+  const refImg = ctx.getImageData(0, 0, width, height).data;
+  
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#000';
+  
+  ctx.font = `${height}px ${font.name}`;
+  ctx.fillText(char, 0, height);
+  const defImg = ctx.getImageData(0, 0, width, height).data;
+  
+  const isMatch = (() => {
+    for (let y = 3; y < height; y += 6) {
+      for (let x = 1; x < width; x += 6) {
+        const index = 4 * (y * width + x);
+        if (refImg[index] !== defImg[index]) return false;
+      }
+    }
+    return true;
+  })();
+  
+  charMap.set(char, isMatch);
+  return isMatch;
+};
+
+const idFontCache = new Map();
+
 const idFont = (font) => {
-  LT.drawing.context.font = `32px ${font.name}, ${LT.storage.fontStacks.standard}`;
-  return [...'xgh@AW.*|&?', 'LVAW.Y+Ta'].reduce((id, x) =>
-    id + LT.drawing.context.measureText(x).width, 0);
+  if (idFontCache.has(font.name)) return idFontCache.get(font.name);
+  
+  LT.drawing.context.font = `32px ${font.name}`;
+  
+  const id = [...'xgh@AW*| &?', 'LVAW.Y+Ta']
+    .map(x => LT.drawing.context.measureText(x).width)
+    .reduce((acc, x) => acc + x, 0);
+  
+  idFontCache.set(font.name, id);
+  return id;
 };
 
 const fontExists = (font) => {

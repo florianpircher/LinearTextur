@@ -348,3 +348,8 @@
 .cell-text-view.fallback-font {
   color: var(--cc-row-label-fg);
 }
+
+.missing-glyph-run {
+  font: 0.6em var(--ff-01);
+  color: var(--cc-C-a1);
+}
