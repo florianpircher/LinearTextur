@@ -72,9 +72,9 @@ const initField = (key, set, update, defaultValue = null) => {
 };
 const main = new LT.Interface();
 const state = LT.State = {
-  drawEnabled: false,
-  cells: {},
-  fonts: {},
+  drawingEnabled: false,
+  cells: [],
+  fonts: [],
   matchHeightMethod: LT.MatchHeightMethod.bodyHeight,
 };
 
@@ -204,13 +204,51 @@ const matchFonts = async (fonts, matchMethod) => {
   });
 };
 
-const renderSpan = (span) => {
+const renderSpan = (span, font) => {
   const element = document.createElement('span');
   element.classList.add('span-view');
   element.classList.add(span.isAlignmentMarker
     ? 'alignment-span'
     : 'text-span');
-  element.textContent = span.value;
+  
+  const hasFont = fontExists(font); 
+  
+  if (hasFont) {
+    const runs = [];
+    let currentRunText = '';
+    
+    for (const char of span.value) {
+      const hasGlyph = containsCharacter(font, char);
+      
+      if (hasGlyph) {
+        currentRunText += char;
+      } else {
+        const run = document.createElement('span');
+        run.textContent = currentRunText;
+        runs.push(run);
+        currentRunText = '';
+        
+        const charRun = document.createElement('span');
+        charRun.classList.add('missing-glyph-run');
+        charRun.textContent = '�';
+        charRun.title = `Missing glyph for character U+${char.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')} (${char})`;
+        runs.push(charRun);
+      }
+    }
+    
+    if (currentRunText !== '') {
+      const run = document.createElement('span');
+      run.textContent = currentRunText;
+      runs.push(run);
+    }
+    
+    for (const run of runs) {
+      element.appendChild(run);
+    }
+  } else {
+    element.textContent = span.value;
+  }
+  
   return element;
 };
 
@@ -231,7 +269,7 @@ const render = (cells, font) => new LT.Row(font, cells.map((cell) => {
     textWrapper.classList.add('fallback-font');
   }
   
-  const spans = cell.spans.map(renderSpan);
+  const spans = cell.spans.map(x => renderSpan(x, font));
   for (const span of spans) textWrapper.appendChild(span);
   
   return new LT.Rendering(cell, font, element, textWrapper, spans);
@@ -485,5 +523,5 @@ main.addEndpoint([elements.matchBodyHeight, elements.matchCapHeight, elements.ma
 
 window.addEventListener('load', () => {
   document.documentElement.classList.remove('no-transitions');
+  main.init(draw, state);
 });
-main.init(draw, state);
