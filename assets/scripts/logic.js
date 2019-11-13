@@ -32,9 +32,12 @@ const fontSettingsDefaults = [
     {name: 'serif'},
   ],
   [
+    {name: 'Palatino nova', configString: 'italic +onum'},
     {name: 'Palatino Linotype', configString: 'italic +onum'},
     {name: 'Palatino', configString: 'italic'},
     {name: 'Palladio', configString: 'italic'},
+    {name: 'Aldus nova', configString: 'italic +onum'},
+    {name: 'Aldus', configString: 'italic'},
     {name: 'URW Palladio L', configString: 'italic'},
     {name: 'Book Antiqua', configString: 'italic'},
     {name: 'Linux Libertine', configString: 'italic'},
