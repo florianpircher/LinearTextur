@@ -151,6 +151,7 @@ const fontExists = (font) => {
 
 const applyFontToElement = (font, element, fontStack, normalize = true) => {
   element.style.fontFamily = `${font.name}, ${fontStack}`;
+  element.style.setProperty('--font', font.name);
   
   if (normalize) {
     element.style.fontSize = `${font.scaleFactor}em`;

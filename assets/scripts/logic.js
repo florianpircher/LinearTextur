@@ -207,6 +207,10 @@ const matchFonts = async (fonts, matchMethod) => {
   });
 };
 
+const toUnicodeCode = (char) => {
+  return char.codePointAt(0).toString(16).toUpperCase().padStart(4,'0');
+}
+
 const renderSpan = (span, font) => {
   const element = document.createElement('span');
   element.classList.add('span-view');
@@ -217,36 +221,60 @@ const renderSpan = (span, font) => {
   const hasFont = fontExists(font); 
   
   if (hasFont) {
-    const runs = [];
-    let currentRunText = '';
+    const runStack = [];
+    let textStack = [];
+    let failStack = [];
+    
+    const flushText = () => {
+      if (textStack.length === 0) return;
+      const string = textStack.join('');
+      textStack = [];
+      runStack.push({ type: 'text', value: string });
+    };
+    const flushFail = () => {
+      if (failStack.length === 0) return;
+      const string = failStack.join('');
+      failStack = [];
+      runStack.push({ type: 'fail', value: string });
+    };
     
     for (const char of span.value) {
       const hasGlyph = containsCharacter(font, char);
       
       if (hasGlyph) {
-        currentRunText += char;
+        flushFail();
+        textStack.push(char);
       } else {
-        const run = document.createElement('span');
-        run.textContent = currentRunText;
-        runs.push(run);
-        currentRunText = '';
-        
-        const charRun = document.createElement('span');
-        charRun.classList.add('missing-glyph-run');
-        charRun.textContent = '�';
-        charRun.title = `Missing glyph for character U+${char.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')} (\u200C${char})`;
-        runs.push(charRun);
+        flushText();
+        failStack.push(char);
       }
     }
     
-    if (currentRunText !== '') {
-      const run = document.createElement('span');
-      run.textContent = currentRunText;
-      runs.push(run);
-    }
+    flushFail();
+    flushText();
     
-    for (const run of runs) {
-      element.appendChild(run);
+    for (const run of runStack) {
+      const span = document.createElement('span');
+      
+      if (run.type === 'text') {
+        span.textContent = run.value;
+      }
+      else if (run.type === 'fail') {
+        span.classList.add('missing-glyph-run');
+        span.textContent = run.value;
+        
+        const chars = Array.from(run.value);
+        let message = 'Missing glyph';
+        if (chars.length > 1) message += 's';
+        message += ' for character';
+        if (chars.length > 1) message += 's';
+        message += ' ' + chars.map(x => 'U+' + toUnicodeCode(x)).join(', ');
+        message += ` (\u200C${run.value})`;
+        
+        span.title = message;
+      }
+      
+      element.appendChild(span);
     }
   } else {
     element.textContent = span.value;

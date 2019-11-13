@@ -350,6 +350,6 @@
 }
 
 .missing-glyph-run {
-  font: 0.6em var(--ff-01);
+  font-family: var(--font), var(--ff-01);
   color: var(--cc-C-a1);
 }
