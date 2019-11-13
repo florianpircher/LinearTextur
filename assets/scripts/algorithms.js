@@ -1,8 +1,8 @@
 // Returns whether a is a prefix of b
 const isPrefix = (a, b) => b.substring(0, a.length) === a;
 
-// Completes a prefix to the first matching option, null else. A prefix of
-// empty-string yilds null.
+// Returns the the first matching completion for a prefix, else returns null. A
+// prefix of an empty-string returns null.
 const complete = (prefix, options) => {
   if (prefix === '') { return null; }
   
@@ -19,8 +19,8 @@ const indexMax = (xs) =>
   xs.reduce(([y, j], x, i) => x > y ? [x, i] : [y, j], [-Infinity, 0])[1];
 
 const median = (xs) => {
-  xs = [...xs].sort((a, b) => a - b);
-
+  xs = Array.from(xs).sort((a, b) => a - b);
+  
   if (xs.length % 2 === 0) {
     return (xs[xs.length / 2] + xs[xs.length / 2 - 1]) / 2;
   }
