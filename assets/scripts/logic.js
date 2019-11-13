@@ -234,7 +234,7 @@ const renderSpan = (span, font) => {
         const charRun = document.createElement('span');
         charRun.classList.add('missing-glyph-run');
         charRun.textContent = '�';
-        charRun.title = `Missing glyph for character U+${char.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')} (${char})`;
+        charRun.title = `Missing glyph for character U+${char.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')} (\u200C${char})`;
         runs.push(charRun);
       }
     }
