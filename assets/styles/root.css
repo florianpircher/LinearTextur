@@ -17,8 +17,12 @@
   --ff-02: 'SFMono-Regular', 'Menlo', 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Liberation Mono', 'Consolas', monospace, var(--ff-01);
   /* sizing */
   --mod: 1.2;
+  --size-00: calc(var(--size-01) / var(--mod));
   --size-01: 1rem;
-  --size-02: calc(var(--size-01) / var(--mod));
+  --size-02: calc(var(--size-01) * var(--mod));
+  --size-03: calc(var(--size-02) * var(--mod));
+  --size-04: calc(var(--size-03) * var(--mod));
+  --size-05: calc(var(--size-04) * var(--mod));
   /* monochrom palette */
   --cc-A: #fdfdfd;
   --cc-A-a1: #f2f2f2;

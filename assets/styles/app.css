@@ -5,7 +5,7 @@
   grid-template-areas: 
     '. title string . .'
     '. controls settings options .';
-  grid-row-gap: var(--size-02);
+  grid-row-gap: var(--size-00);
   padding-top: var(--size-01);
 }
 @media all and (max-width: 1084px) {
@@ -115,6 +115,7 @@
 #input-field {
   display: block;
   text-align: center;
+  height: var(--size-05);
 }
 
 #font-settings-field {
@@ -131,13 +132,13 @@
 /* -------------------------------------------------------------------------- */
 
 .control + .control  {
-  margin-top: calc(var(--size-02) / 2);
+  margin-top: calc(var(--size-00) / 2);
 }
 
 .control .label {
   user-select: none;
   display: block;
-  font-size: var(--size-02);
+  font-size: var(--size-00);
   font-feature-settings: 'smcp', 'c2sc';
 }
 
@@ -260,7 +261,7 @@
   user-select: none;
   position: relative;
   display: inline-block;
-  font-size: var(--size-02);
+  font-size: var(--size-00);
   vertical-align: baseline;
   padding-left: 22px;
   top: -0.3em;
@@ -270,7 +271,7 @@
 .radios-label {
   user-select: none;
   position: relative;
-  font-size: var(--size-02);
+  font-size: var(--size-00);
   vertical-align: baseline;
   margin-right: 0.5em;
   cursor: default;
