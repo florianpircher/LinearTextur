@@ -323,9 +323,9 @@
 }
 
 #matrix {
-  --setting-font-size: 2rem;
-  --setting-column-spacing: 1.5em;
-  --setting-row-spacing: 0.5em;
+  --setting-font-size: 2em;
+  --setting-column-spacing: 1.5;
+  --setting-row-spacing: 0.5;
   font-size: var(--setting-font-size);
   line-height: 1;
   margin-right: auto;
@@ -337,17 +337,31 @@
   white-space: pre;
 }
 .cell-view + .cell-view {
-  padding-left: var(--setting-column-spacing);
+  padding-left: calc(1em * var(--setting-column-spacing));
 }
-.row-view + .row-view .cell-view {
-  padding-top: var(--setting-row-spacing);
+.row-view + .label-row-view + .row-view .cell-view {
+  padding-top: calc(1em * var(--setting-row-spacing));
+}
+
+.label-view {
+  font-size: 0.8rem;
+  letter-spacing: 0.0125em;
+  color: var(--cc-row-label-fg);
+  padding-left: var(--offset-leading, 0);
+}
+
+.label-text {
+  position: sticky;
+  padding-top: calc(1em * var(--setting-row-spacing));
+  left: 1rem;
 }
 
 .cell-text-view {
   font-family: 'Adobe NotDef';
+  margin-left: var(--offset-leading, 0);
 }
 .cell-text-view.fallback-font {
-  color: var(--cc-row-label-fg);
+  color: var(--cc-row-fallback-fg);
 }
 
 .missing-glyph-run {

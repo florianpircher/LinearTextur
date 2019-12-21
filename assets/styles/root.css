@@ -48,6 +48,7 @@
   --cc-checkbox-border: var(--cc-C);
   --cc-checkbox-border-F: var(--cc-F);
   --cc-checkbox-radio-dot: var(--cc-D);
+  --cc-row-fallback-fg: var(--cc-C-a1);
   --cc-row-label-fg: var(--cc-C-a1);
 }
 

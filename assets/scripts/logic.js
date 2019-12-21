@@ -258,6 +258,7 @@ const renderSpan = (span, font) => {
       
       if (run.type === 'text') {
         span.textContent = run.value;
+        span.classList.add('glyph-run');
       }
       else if (run.type === 'fail') {
         span.classList.add('missing-glyph-run');
@@ -272,6 +273,10 @@ const renderSpan = (span, font) => {
         message += ` (\u200C${run.value})`;
         
         span.title = message;
+        
+        const refHeight = scanGlyphsHeight('x', 0.55)({name: LT.storage.fontStacks.standard});
+        const nilHeight = scanGlyphsHeight('x', 0.55)(font);
+        span.style.fontSize = `${nilHeight / refHeight}em`;
       }
       
       element.appendChild(span);
@@ -315,7 +320,7 @@ const measureRendering = (rendering) => {
 const drawRow = (row) => new Promise((resolve) => {
   const rowNode = document.createElement('tr');
   rowNode.classList.add('row-view');
-  
+  console.log(row);
   for (const rendering of row.renderings) {
     rowNode.appendChild(rendering.element);
   }
@@ -328,6 +333,17 @@ const drawRow = (row) => new Promise((resolve) => {
   });
   observer.observe(elements.matrix, observeNodeTree);
   elements.matrix.appendChild(rowNode);
+  
+  const labelRowNode = document.createElement('tr');
+  labelRowNode.classList.add('label-row-view');
+  const labelNode = document.createElement('td');
+  labelNode.classList.add('label-view');
+  const labelTextNode = document.createElement('span');
+  labelTextNode.classList.add('label-text');
+  labelTextNode.textContent = row.font.name;
+  labelNode.appendChild(labelTextNode);
+  labelRowNode.appendChild(labelNode);
+  elements.matrix.appendChild(labelRowNode);
 });
 
 const alignColumn = (column) => {
@@ -336,13 +352,11 @@ const alignColumn = (column) => {
   const maxView = views[maxIndex];
   const maxLeft = maxView.offsetLeft;
   
-  for (const view of views) {
+  return views.map((view) => {
     const deltaAlign = maxLeft - view.offsetLeft;
     const deltaCenter = (maxView.alignmentWidth - view.alignmentWidth) / 2;
-    const delta = deltaAlign + deltaCenter;
-    
-    view.textWrapper.style.marginLeft = `${delta}px`;
-  }
+    return deltaAlign + deltaCenter;
+  });
 };
 
 const draw = async (state) => {
@@ -361,7 +375,14 @@ const draw = async (state) => {
   
   for (const column of matrix) {
     if (column.spans.some(x => x.isAlignmentMarker)) {
-      alignColumn(column);
+      const deltas = alignColumn(column);
+      console.log(column);
+      for (let i = 0; i < column.renderings.length; i++) {
+        const view = column.renderings[i];
+        const delta = deltas[i];
+        view.textWrapper.style.setProperty('--offset-leading', `${delta}px`);
+        view.element.parentElement.nextElementSibling.style.setProperty('--offset-leading', `${delta}px`);
+      }
     }
   }
 };
@@ -466,12 +487,12 @@ main.addEndpoint([elements.fontSize, elements.columnSpacing, elements.rowSpacing
   };
   const updateColumnSpacing = () => {
     const value = cs.valueAsNumber;
-    elements.matrix.style.setProperty('--setting-column-spacing', value + 'em');
+    elements.matrix.style.setProperty('--setting-column-spacing', value);
     save(COLUMN_SPACING_KEY, value);
   };
   const updateRowSpacing = () => {
     const value = rs.valueAsNumber;
-    elements.matrix.style.setProperty('--setting-row-spacing', value + 'em');
+    elements.matrix.style.setProperty('--setting-row-spacing', value);
     save(ROW_SPACING_KEY, value);
   };
   
