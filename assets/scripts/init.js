@@ -14,6 +14,13 @@ const LinearTextur = (() => {
       },
       notDefinedFontName: notDefinedFontName,
     },
+    preferences: new Map([['showFontName', true]]),
   };
 })();
 const LT = LinearTextur;
+
+window['setPreference'] = (key, value) => {
+  LT.preferences.set(key, value);
+};
+
+LT.preferenceForKey = key => LT.preferences.get(key);

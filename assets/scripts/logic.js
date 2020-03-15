@@ -334,16 +334,19 @@ const drawRow = (row) => new Promise((resolve) => {
   observer.observe(elements.matrix, observeNodeTree);
   elements.matrix.appendChild(rowNode);
   
-  const labelRowNode = document.createElement('tr');
-  labelRowNode.classList.add('label-row-view');
-  const labelNode = document.createElement('td');
-  labelNode.classList.add('label-view');
-  const labelTextNode = document.createElement('span');
-  labelTextNode.classList.add('label-text');
-  labelTextNode.textContent = row.font.name;
-  labelNode.appendChild(labelTextNode);
-  labelRowNode.appendChild(labelNode);
-  elements.matrix.appendChild(labelRowNode);
+  if (LT.preferenceForKey('showFontName')) {
+    const labelRowNode = document.createElement('tr');
+    labelRowNode.classList.add('label-row-view');
+    const labelNode = document.createElement('td');
+    labelNode.classList.add('label-view');
+    labelNode.colSpan = row.renderings.length;
+    const labelTextNode = document.createElement('span');
+    labelTextNode.classList.add('label-text');
+    labelTextNode.textContent = row.font.name;
+    labelNode.appendChild(labelTextNode);
+    labelRowNode.appendChild(labelNode);
+    elements.matrix.appendChild(labelRowNode);
+  }
 });
 
 const alignColumn = (column) => {
@@ -381,7 +384,11 @@ const draw = async (state) => {
         const view = column.renderings[i];
         const delta = deltas[i];
         view.textWrapper.style.setProperty('--offset-leading', `${delta}px`);
-        view.element.parentElement.nextElementSibling.style.setProperty('--offset-leading', `${delta}px`);
+        
+        if (LT.preferenceForKey('showFontName')) {
+          const label = view.element.parentElement.nextElementSibling;
+          label.style.setProperty('--offset-leading', `${delta}px`);
+        }
       }
     }
   }
