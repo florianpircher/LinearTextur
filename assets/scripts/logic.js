@@ -320,7 +320,7 @@ const measureRendering = (rendering) => {
 const drawRow = (row) => new Promise((resolve) => {
   const rowNode = document.createElement('tr');
   rowNode.classList.add('row-view');
-  console.log(row);
+  
   for (const rendering of row.renderings) {
     rowNode.appendChild(rendering.element);
   }
@@ -376,7 +376,7 @@ const draw = async (state) => {
   for (const column of matrix) {
     if (column.spans.some(x => x.isAlignmentMarker)) {
       const deltas = alignColumn(column);
-      console.log(column);
+      
       for (let i = 0; i < column.renderings.length; i++) {
         const view = column.renderings[i];
         const delta = deltas[i];
