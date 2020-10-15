@@ -14,13 +14,34 @@ const LinearTextur = (() => {
       },
       notDefinedFontName: notDefinedFontName,
     },
-    preferences: new Map([['showFontName', true]]),
+    preferences: {'showFontName': true},
   };
 })();
 const LT = LinearTextur;
 
-window['setPreference'] = (key, value) => {
-  LT.preferences.set(key, value);
+// Storage
+
+const STORAGE_PREFIX = 'com.linear-textur.app';
+const storage = window.localStorage;
+const save = (key, value) => storage.setItem(key, JSON.stringify(value));
+const load = (key) => {
+  const value = storage.getItem(key);
+  return value === null ? null : JSON.parse(value);
 };
 
-LT.preferenceForKey = key => LT.preferences.get(key);
+// Preferences
+
+const CONFIG_KEY = STORAGE_PREFIX + '.preferences.config';
+
+window['setPreference'] = (key, value) => {
+  LT.preferences[key] = value;
+  save(CONFIG_KEY, LT.preferences);
+};
+
+const initPreferences = load(CONFIG_KEY);
+
+if (initPreferences !== null) {
+  LT.preferences = initPreferences;
+}
+
+LT.preferenceForKey = key => LT.preferences[key];

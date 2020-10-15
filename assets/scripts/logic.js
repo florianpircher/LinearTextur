@@ -1,5 +1,4 @@
 // Storage Keys
-const STORAGE_PREFIX = 'com.linear-textur.app';
 const STRING_KEY = STORAGE_PREFIX + '.data.string';
 const FONTS_KEY = STORAGE_PREFIX + '.data.fonts';
 const FONT_SIZE_KEY = STORAGE_PREFIX + '.preferences.font-size';
