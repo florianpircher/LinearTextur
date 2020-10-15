@@ -9,33 +9,33 @@ const MATCH_HEIGHT_METHOD_KEY = STORAGE_PREFIX + '.preferences.match-height';
 // Defaults
 const fontSettingsDefaults = [
   [
-    {name: 'Avenir Next', configString: '+onum'},
+    {name: 'Avenir Next', configString: 'onum=1'},
     {name: 'Corbel'},
-    {name: 'Lucida Grande', configString: '+onum'},
-    {name: 'Lucida Sans Unicode', configString: '+onum'},
-    {name: 'Lucida Sans', configString: '+onum'},
-    {name: 'DejaVu Sans', configString: '+onum'},
-    {name: 'Bitstream Vera Sans', configString: '+onum'},
-    {name: 'Liberation Sans', configString: '+onum'},
+    {name: 'Lucida Grande', configString: 'onum=1'},
+    {name: 'Lucida Sans Unicode', configString: 'onum=1'},
+    {name: 'Lucida Sans', configString: 'onum=1'},
+    {name: 'DejaVu Sans', configString: 'onum=1'},
+    {name: 'Bitstream Vera Sans', configString: 'onum=1'},
+    {name: 'Liberation Sans', configString: 'onum=1'},
     {name: 'Verdana'},
     {name: 'sans-serif'},
   ],
   [
-    {name: 'Iowan Old Style', configString: '+smcp'},
-    {name: 'Constantia', configString: '+smcp +onum'},
-    {name: 'Linux Libertine', configString: '+smcp +onum'},
-    {name: 'Utopia', configString: '+smcp +onum'},
-    {name: 'DejaVu Serif', configString: '+smcp +onum'},
+    {name: 'Iowan Old Style', configString: 'smcp=1'},
+    {name: 'Constantia', configString: 'smcp=1 onum=1'},
+    {name: 'Linux Libertine', configString: 'smcp=1 onum=1'},
+    {name: 'Utopia', configString: 'smcp=1 onum=1'},
+    {name: 'DejaVu Serif', configString: 'smcp=1 onum=1'},
     {name: 'Georgia'},
     {name: 'Times New Roman'},
     {name: 'serif'},
   ],
   [
-    {name: 'Palatino nova', configString: 'italic +onum'},
-    {name: 'Palatino Linotype', configString: 'italic +onum'},
+    {name: 'Palatino nova', configString: 'italic onum=1'},
+    {name: 'Palatino Linotype', configString: 'italic onum=1'},
     {name: 'Palatino', configString: 'italic'},
     {name: 'Palladio', configString: 'italic'},
-    {name: 'Aldus nova', configString: 'italic +onum'},
+    {name: 'Aldus nova', configString: 'italic onum=1'},
     {name: 'Aldus', configString: 'italic'},
     {name: 'URW Palladio L', configString: 'italic'},
     {name: 'Book Antiqua', configString: 'italic'},
@@ -45,14 +45,6 @@ const fontSettingsDefaults = [
     {name: 'cursive', configString: 'italic'},
   ],
 ];
-
-// Storage
-const storage = window.localStorage;
-const save = (key, value) => storage.setItem(key, JSON.stringify(value));
-const load = (key) => {
-  const value = storage.getItem(key);
-  return value === null ? null : JSON.parse(value);
-};
 
 // Utilitys
 const removeAllChildren = (node) => {  // (Node) -> ()
@@ -113,7 +105,7 @@ const renderTestNode = (height) => (font) => {
   return testNode;
 };
 
-const manuelMatchFontsXHeight = (fonts) => {
+const manualMatchFontsXHeight = (fonts) => {
   const testNodesParent = elements.metrics;
   const testNodes = fonts.map(renderTestNode('1ex'));
   
@@ -131,7 +123,7 @@ const manuelMatchFontsXHeight = (fonts) => {
       resolve(scalars);
     });
     observer.observe(testNodesParent, observeNodeTree);
-  })
+  });
   
   // Render
   removeAllChildren(testNodesParent);
@@ -179,7 +171,7 @@ const manualMatchFontsGlyphsHeight = (fonts, glyphs, defaultHeight) => {
   return heights.map(x => medianHeight / x);
 };
 
-const manuelMatchFontsCapHeight = fonts =>
+const manualMatchFontsCapHeight = fonts =>
   manualMatchFontsGlyphsHeight(fonts, ['H', 'X', 'V'], 0.7);
 
 const scalarsForMatchingFonts = (fonts, matchMethod) => {
@@ -188,10 +180,10 @@ const scalarsForMatchingFonts = (fonts, matchMethod) => {
     return new Array(fonts.length).fill(1);
   case LT.MatchHeightMethod.capHeight:
     // TODO: test for support for advanced text metrics
-    return manuelMatchFontsCapHeight(fonts);
+    return manualMatchFontsCapHeight(fonts);
   case LT.MatchHeightMethod.xHeight:
     // TODO: test for support for advanced text metrics
-    return manuelMatchFontsXHeight(fonts);
+    return manualMatchFontsXHeight(fonts);
   default:
     console.error('Illegal match method.', matchMethod);
     throw new Error('Illegal match method.');
@@ -319,6 +311,7 @@ const measureRendering = (rendering) => {
 const drawRow = (row) => new Promise((resolve) => {
   const rowNode = document.createElement('tr');
   rowNode.classList.add('row-view');
+  rowNode.title = row.font.name;
   
   for (const rendering of row.renderings) {
     rowNode.appendChild(rendering.element);
