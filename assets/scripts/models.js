@@ -94,22 +94,25 @@ const containsCharacter = (font, char) => {
   
   const width = LT.drawing.canvas.width;
   const height = LT.drawing.canvas.height;
+  const fontSize = height / 2;
+  const renderX = width * 0.33;
+  const renderY = height * 0.75;
   const ctx = LT.drawing.context;
   
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = '#000';
   
-  ctx.font = `${height}px ${font.name}, ${LT.storage.fontStacks.notDefined}`;
-  ctx.fillText(char, 0, height);
+  ctx.font = `${fontSize}px ${font.name}, ${LT.storage.fontStacks.notDefined}`;
+  ctx.fillText(char, renderX, renderY);
   const refImg = ctx.getImageData(0, 0, width, height).data;
   
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = '#000';
   
-  ctx.font = `${height}px ${font.name}`;
-  ctx.fillText(char, 0, height);
+  ctx.font = `${fontSize}px ${font.name}`;
+  ctx.fillText(char, renderX, renderY);
   const defImg = ctx.getImageData(0, 0, width, height).data;
   
   const isMatch = (() => {
@@ -148,6 +151,7 @@ const fontExists = (font) => {
 
 const applyFontToElement = (font, element, fontStack, normalize = true) => {
   element.style.fontFamily = `${font.name}, ${fontStack}`;
+  element.style.setProperty('--font', font.name);
   
   if (normalize) {
     element.style.fontSize = `${font.scaleFactor}em`;
@@ -165,7 +169,7 @@ const applyFontToElement = (font, element, fontStack, normalize = true) => {
     }
     if (config.features !== undefined) {
       element.style['fontFeatureSettings'] = Array.from(config.features.entries())
-        .map(([tag, enabled]) => `'${tag}' ${enabled ? 'on' : 'off'}`)
+        .map(([tag, selector]) => `'${tag}' ${selector}`)
         .join(', ');
     }
   }

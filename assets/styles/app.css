@@ -5,7 +5,7 @@
   grid-template-areas: 
     '. title string . .'
     '. controls settings options .';
-  grid-row-gap: var(--size-02);
+  grid-row-gap: var(--size-00);
   padding-top: var(--size-01);
 }
 @media all and (max-width: 1084px) {
@@ -115,6 +115,7 @@
 #input-field {
   display: block;
   text-align: center;
+  height: var(--size-05);
 }
 
 #font-settings-field {
@@ -131,13 +132,13 @@
 /* -------------------------------------------------------------------------- */
 
 .control + .control  {
-  margin-top: calc(var(--size-02) / 2);
+  margin-top: calc(var(--size-00) / 2);
 }
 
 .control .label {
   user-select: none;
   display: block;
-  font-size: var(--size-02);
+  font-size: var(--size-00);
   font-feature-settings: 'smcp', 'c2sc';
 }
 
@@ -260,7 +261,7 @@
   user-select: none;
   position: relative;
   display: inline-block;
-  font-size: var(--size-02);
+  font-size: var(--size-00);
   vertical-align: baseline;
   padding-left: 22px;
   top: -0.3em;
@@ -270,7 +271,7 @@
 .radios-label {
   user-select: none;
   position: relative;
-  font-size: var(--size-02);
+  font-size: var(--size-00);
   vertical-align: baseline;
   margin-right: 0.5em;
   cursor: default;
@@ -285,7 +286,6 @@
   height: 16px;
   background-color: var(--cc-checkbox-bg);
   border: 1px solid var(--cc-checkbox-border);
-  vertical-align: baseline;
   top: -2px;
   left: 0;
 }
@@ -318,13 +318,12 @@
 
 .content {
   margin-top: calc(var(--size-01) * var(--mod));
-  margin-bottom: calc(var(--size-01) * var(--mod));
 }
 
 #matrix {
-  --setting-font-size: 2rem;
-  --setting-column-spacing: 1.5em;
-  --setting-row-spacing: 0.5em;
+  --setting-font-size: 2em;
+  --setting-column-spacing: 1.5;
+  --setting-row-spacing: 0.5;
   font-size: var(--setting-font-size);
   line-height: 1;
   margin-right: auto;
@@ -336,20 +335,34 @@
   white-space: pre;
 }
 .cell-view + .cell-view {
-  padding-left: var(--setting-column-spacing);
+  padding-left: calc(1em * var(--setting-column-spacing));
 }
-.row-view + .row-view .cell-view {
-  padding-top: var(--setting-row-spacing);
+.row-view ~ .row-view .cell-view {
+  padding-top: calc(1em * var(--setting-row-spacing));
+}
+
+.label-view {
+  font-size: 0.8rem;
+  letter-spacing: 0.0125em;
+  color: var(--cc-row-label-fg);
+  padding-left: var(--offset-leading, 0);
+}
+
+.label-text {
+  position: sticky;
+  padding-top: calc(1em * var(--setting-row-spacing));
+  left: 1rem;
 }
 
 .cell-text-view {
   font-family: 'Adobe NotDef';
+  margin-left: var(--offset-leading, 0);
 }
 .cell-text-view.fallback-font {
-  color: var(--cc-row-label-fg);
+  color: var(--cc-row-fallback-fg);
 }
 
 .missing-glyph-run {
-  font: 0.6em var(--ff-01);
+  font-family: var(--font), var(--ff-01);
   color: var(--cc-C-a1);
 }

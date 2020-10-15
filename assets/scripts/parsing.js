@@ -105,12 +105,12 @@ const parseFontConfiguration = (string, defaultConfig) => {
       // style keyword
       config.style = completeStyle;
     }
-    else if (/^[+-]\S{4}$/.test(part)) {
+    else if (/^\S{4}=(\d+)$/.test(part)) {
       // OpenType feature tag
-      const tag = part.slice(1, 5);
-      const enabled = part[0] === '+';
+      const tag = part.slice(0, 4);
+      const index = part.slice(5);
       if (config.features === undefined) config.features = new Map();
-      config.features.set(tag, enabled);
+      config.features.set(tag, index);
     }
   }
   

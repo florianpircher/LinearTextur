@@ -1,5 +1,4 @@
 // Storage Keys
-const STORAGE_PREFIX = 'com.linear-textur.app';
 const STRING_KEY = STORAGE_PREFIX + '.data.string';
 const FONTS_KEY = STORAGE_PREFIX + '.data.fonts';
 const FONT_SIZE_KEY = STORAGE_PREFIX + '.preferences.font-size';
@@ -10,31 +9,34 @@ const MATCH_HEIGHT_METHOD_KEY = STORAGE_PREFIX + '.preferences.match-height';
 // Defaults
 const fontSettingsDefaults = [
   [
-    {name: 'Avenir Next', configString: '+onum'},
+    {name: 'Avenir Next', configString: 'onum=1'},
     {name: 'Corbel'},
-    {name: 'Lucida Grande', configString: '+onum'},
-    {name: 'Lucida Sans Unicode', configString: '+onum'},
-    {name: 'Lucida Sans', configString: '+onum'},
-    {name: 'DejaVu Sans', configString: '+onum'},
-    {name: 'Bitstream Vera Sans', configString: '+onum'},
-    {name: 'Liberation Sans', configString: '+onum'},
+    {name: 'Lucida Grande', configString: 'onum=1'},
+    {name: 'Lucida Sans Unicode', configString: 'onum=1'},
+    {name: 'Lucida Sans', configString: 'onum=1'},
+    {name: 'DejaVu Sans', configString: 'onum=1'},
+    {name: 'Bitstream Vera Sans', configString: 'onum=1'},
+    {name: 'Liberation Sans', configString: 'onum=1'},
     {name: 'Verdana'},
     {name: 'sans-serif'},
   ],
   [
-    {name: 'Iowan Old Style', configString: '+smcp'},
-    {name: 'Constantia', configString: '+smcp +onum'},
-    {name: 'Linux Libertine', configString: '+smcp +onum'},
-    {name: 'Utopia', configString: '+smcp +onum'},
-    {name: 'DejaVu Serif', configString: '+smcp +onum'},
+    {name: 'Iowan Old Style', configString: 'smcp=1'},
+    {name: 'Constantia', configString: 'smcp=1 onum=1'},
+    {name: 'Linux Libertine', configString: 'smcp=1 onum=1'},
+    {name: 'Utopia', configString: 'smcp=1 onum=1'},
+    {name: 'DejaVu Serif', configString: 'smcp=1 onum=1'},
     {name: 'Georgia'},
     {name: 'Times New Roman'},
     {name: 'serif'},
   ],
   [
-    {name: 'Palatino Linotype', configString: 'italic +onum'},
+    {name: 'Palatino nova', configString: 'italic onum=1'},
+    {name: 'Palatino Linotype', configString: 'italic onum=1'},
     {name: 'Palatino', configString: 'italic'},
     {name: 'Palladio', configString: 'italic'},
+    {name: 'Aldus nova', configString: 'italic onum=1'},
+    {name: 'Aldus', configString: 'italic'},
     {name: 'URW Palladio L', configString: 'italic'},
     {name: 'Book Antiqua', configString: 'italic'},
     {name: 'Linux Libertine', configString: 'italic'},
@@ -43,14 +45,6 @@ const fontSettingsDefaults = [
     {name: 'cursive', configString: 'italic'},
   ],
 ];
-
-// Storage
-const storage = window.localStorage;
-const save = (key, value) => storage.setItem(key, JSON.stringify(value));
-const load = (key) => {
-  const value = storage.getItem(key);
-  return value === null ? null : JSON.parse(value);
-};
 
 // Utilitys
 const removeAllChildren = (node) => {  // (Node) -> ()
@@ -111,7 +105,7 @@ const renderTestNode = (height) => (font) => {
   return testNode;
 };
 
-const manuelMatchFontsXHeight = (fonts) => {
+const manualMatchFontsXHeight = (fonts) => {
   const testNodesParent = elements.metrics;
   const testNodes = fonts.map(renderTestNode('1ex'));
   
@@ -129,7 +123,7 @@ const manuelMatchFontsXHeight = (fonts) => {
       resolve(scalars);
     });
     observer.observe(testNodesParent, observeNodeTree);
-  })
+  });
   
   // Render
   removeAllChildren(testNodesParent);
@@ -177,7 +171,7 @@ const manualMatchFontsGlyphsHeight = (fonts, glyphs, defaultHeight) => {
   return heights.map(x => medianHeight / x);
 };
 
-const manuelMatchFontsCapHeight = fonts =>
+const manualMatchFontsCapHeight = fonts =>
   manualMatchFontsGlyphsHeight(fonts, ['H', 'X', 'V'], 0.7);
 
 const scalarsForMatchingFonts = (fonts, matchMethod) => {
@@ -186,10 +180,10 @@ const scalarsForMatchingFonts = (fonts, matchMethod) => {
     return new Array(fonts.length).fill(1);
   case LT.MatchHeightMethod.capHeight:
     // TODO: test for support for advanced text metrics
-    return manuelMatchFontsCapHeight(fonts);
+    return manualMatchFontsCapHeight(fonts);
   case LT.MatchHeightMethod.xHeight:
     // TODO: test for support for advanced text metrics
-    return manuelMatchFontsXHeight(fonts);
+    return manualMatchFontsXHeight(fonts);
   default:
     console.error('Illegal match method.', matchMethod);
     throw new Error('Illegal match method.');
@@ -204,6 +198,10 @@ const matchFonts = async (fonts, matchMethod) => {
   });
 };
 
+const toUnicodeCode = (char) => {
+  return char.codePointAt(0).toString(16).toUpperCase().padStart(4,'0');
+}
+
 const renderSpan = (span, font) => {
   const element = document.createElement('span');
   element.classList.add('span-view');
@@ -214,36 +212,65 @@ const renderSpan = (span, font) => {
   const hasFont = fontExists(font); 
   
   if (hasFont) {
-    const runs = [];
-    let currentRunText = '';
+    const runStack = [];
+    let textStack = [];
+    let failStack = [];
+    
+    const flushText = () => {
+      if (textStack.length === 0) return;
+      const string = textStack.join('');
+      textStack = [];
+      runStack.push({ type: 'text', value: string });
+    };
+    const flushFail = () => {
+      if (failStack.length === 0) return;
+      const string = failStack.join('');
+      failStack = [];
+      runStack.push({ type: 'fail', value: string });
+    };
     
     for (const char of span.value) {
       const hasGlyph = containsCharacter(font, char);
       
       if (hasGlyph) {
-        currentRunText += char;
+        flushFail();
+        textStack.push(char);
       } else {
-        const run = document.createElement('span');
-        run.textContent = currentRunText;
-        runs.push(run);
-        currentRunText = '';
-        
-        const charRun = document.createElement('span');
-        charRun.classList.add('missing-glyph-run');
-        charRun.textContent = '�';
-        charRun.title = `Missing glyph for character U+${char.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')} (${char})`;
-        runs.push(charRun);
+        flushText();
+        failStack.push(char);
       }
     }
     
-    if (currentRunText !== '') {
-      const run = document.createElement('span');
-      run.textContent = currentRunText;
-      runs.push(run);
-    }
+    flushFail();
+    flushText();
     
-    for (const run of runs) {
-      element.appendChild(run);
+    for (const run of runStack) {
+      const span = document.createElement('span');
+      
+      if (run.type === 'text') {
+        span.textContent = run.value;
+        span.classList.add('glyph-run');
+      }
+      else if (run.type === 'fail') {
+        span.classList.add('missing-glyph-run');
+        span.textContent = run.value;
+        
+        const chars = Array.from(run.value);
+        let message = 'Missing glyph';
+        if (chars.length > 1) message += 's';
+        message += ' for character';
+        if (chars.length > 1) message += 's';
+        message += ' ' + chars.map(x => 'U+' + toUnicodeCode(x)).join(', ');
+        message += ` (\u200C${run.value})`;
+        
+        span.title = message;
+        
+        const refHeight = scanGlyphsHeight('x', 0.55)({name: LT.storage.fontStacks.standard});
+        const nilHeight = scanGlyphsHeight('x', 0.55)(font);
+        span.style.fontSize = `${nilHeight / refHeight}em`;
+      }
+      
+      element.appendChild(span);
     }
   } else {
     element.textContent = span.value;
@@ -284,6 +311,7 @@ const measureRendering = (rendering) => {
 const drawRow = (row) => new Promise((resolve) => {
   const rowNode = document.createElement('tr');
   rowNode.classList.add('row-view');
+  rowNode.title = row.font.name;
   
   for (const rendering of row.renderings) {
     rowNode.appendChild(rendering.element);
@@ -297,6 +325,20 @@ const drawRow = (row) => new Promise((resolve) => {
   });
   observer.observe(elements.matrix, observeNodeTree);
   elements.matrix.appendChild(rowNode);
+  
+  if (LT.preferenceForKey('showFontName')) {
+    const labelRowNode = document.createElement('tr');
+    labelRowNode.classList.add('label-row-view');
+    const labelNode = document.createElement('td');
+    labelNode.classList.add('label-view');
+    labelNode.colSpan = row.renderings.length;
+    const labelTextNode = document.createElement('span');
+    labelTextNode.classList.add('label-text');
+    labelTextNode.textContent = row.font.name;
+    labelNode.appendChild(labelTextNode);
+    labelRowNode.appendChild(labelNode);
+    elements.matrix.appendChild(labelRowNode);
+  }
 });
 
 const alignColumn = (column) => {
@@ -305,13 +347,11 @@ const alignColumn = (column) => {
   const maxView = views[maxIndex];
   const maxLeft = maxView.offsetLeft;
   
-  for (const view of views) {
+  return views.map((view) => {
     const deltaAlign = maxLeft - view.offsetLeft;
     const deltaCenter = (maxView.alignmentWidth - view.alignmentWidth) / 2;
-    const delta = deltaAlign + deltaCenter;
-    
-    view.textWrapper.style.marginLeft = `${delta}px`;
-  }
+    return deltaAlign + deltaCenter;
+  });
 };
 
 const draw = async (state) => {
@@ -330,7 +370,18 @@ const draw = async (state) => {
   
   for (const column of matrix) {
     if (column.spans.some(x => x.isAlignmentMarker)) {
-      alignColumn(column);
+      const deltas = alignColumn(column);
+      
+      for (let i = 0; i < column.renderings.length; i++) {
+        const view = column.renderings[i];
+        const delta = deltas[i];
+        view.textWrapper.style.setProperty('--offset-leading', `${delta}px`);
+        
+        if (LT.preferenceForKey('showFontName')) {
+          const label = view.element.parentElement.nextElementSibling;
+          label.style.setProperty('--offset-leading', `${delta}px`);
+        }
+      }
     }
   }
 };
@@ -435,12 +486,12 @@ main.addEndpoint([elements.fontSize, elements.columnSpacing, elements.rowSpacing
   };
   const updateColumnSpacing = () => {
     const value = cs.valueAsNumber;
-    elements.matrix.style.setProperty('--setting-column-spacing', value + 'em');
+    elements.matrix.style.setProperty('--setting-column-spacing', value);
     save(COLUMN_SPACING_KEY, value);
   };
   const updateRowSpacing = () => {
     const value = rs.valueAsNumber;
-    elements.matrix.style.setProperty('--setting-row-spacing', value + 'em');
+    elements.matrix.style.setProperty('--setting-row-spacing', value);
     save(ROW_SPACING_KEY, value);
   };
   

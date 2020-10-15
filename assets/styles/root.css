@@ -17,27 +17,28 @@
   --ff-02: 'SFMono-Regular', 'Menlo', 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Liberation Mono', 'Consolas', monospace, var(--ff-01);
   /* sizing */
   --mod: 1.2;
+  --size-00: calc(var(--size-01) / var(--mod));
   --size-01: 1rem;
-  --size-02: calc(var(--size-01) / var(--mod));
+  --size-02: calc(var(--size-01) * var(--mod));
+  --size-03: calc(var(--size-02) * var(--mod));
+  --size-04: calc(var(--size-03) * var(--mod));
+  --size-05: calc(var(--size-04) * var(--mod));
   /* monochrom palette */
   --cc-A: #fdfdfd;
   --cc-A-a1: #f2f2f2;
   --cc-C: #aaa;
   --cc-C-a1: #999;
   --cc-D-d1: #777;
-  --cc-D: #666;
-  --cc-D-a1: #525252;
+  --cc-D: #525252;
   --cc-F: #111;
   /* color palette */
   --cc-01: var(--cc-F);
   --cc-02: #eeece8;
-  --cc-03: #c00;
   /* named */
   --cc-field-fg: var(--cc-F);
   --cc-field-bg: var(--cc-A);
   --cc-field-border: var(--cc-C);
   --cc-field-border-F: var(--cc-F);
-  --cc-label-secondary: var(--cc-D);
   --cc-slider-track: var(--cc-C-a1);
   --cc-slider-track-F: var(--cc-F);
   --cc-slider-thumb-bg: var(--cc-A);
@@ -46,9 +47,32 @@
   --cc-checkbox-bg-A: var(--cc-A-a1);
   --cc-checkbox-border: var(--cc-C);
   --cc-checkbox-border-F: var(--cc-F);
-  --cc-checkbox-radio-dot: var(--cc-D-a1);
-  --cc-cell-fallbackfont-fg: var(--cc-C-a1);
+  --cc-checkbox-radio-dot: var(--cc-D);
+  --cc-row-fallback-fg: var(--cc-C-a1);
   --cc-row-label-fg: var(--cc-C-a1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* monochrom palette */
+    --cc-A: #09090b;
+    --cc-A-a1: #1e1e24;
+    --cc-B: #2e2e38;
+    --cc-C: #49495a;
+    --cc-C-a1: #4d4d5b;
+    --cc-D-d2: #7e7e95;
+    --cc-D-d1: #86869c;
+    --cc-D: #9292a5;
+    --cc-F: #9e9eae;
+    /* color palette */
+    --cc-01: var(--cc-F);
+    --cc-02: #141419;
+    /* named */
+    --cc-field-border: var(--cc-B);
+    --cc-field-border-F: var(--cc-C);
+    --cc-checkbox-border-F: var(--cc-D);
+    --cc-checkbox-radio-dot: var(--cc-D-d2);
+  }
 }
 
 html {
